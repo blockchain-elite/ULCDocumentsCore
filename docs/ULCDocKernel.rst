@@ -55,6 +55,7 @@ In order to officially sign a document, you have at least two steps :
   When you push a document into your Kernel, you automatically confirm it. So, if you use a simple signature Kernel, your document is signed with only one transaction.
 
 ::
+    
     struct Document {
           bool initialized;
           bool signed;
@@ -109,6 +110,7 @@ Pusher functions
 Pushing something is the first step to do someting with the data.
 
 ::
+
     function pushDocument(bytes32 _SignatureHash, string memory _source, uint16 _indexDocumentFamily, string memory _extra_data)
 Push a signature into the Signature's Book. Then, you need to confirm it before changing ``sign`` state to ``true``.
 
@@ -116,9 +118,11 @@ Push a signature into the Signature's Book. Then, you need to confirm it before 
   When you push a document into your Kernel, you automatically confirm it. So, if you use a simple signature Kernel, your document is signed with only one transaction.
 
 ::
+
     function confirmDocument(bytes32 _SignatureHash)
 Request to confirm a signature. It can also be used to simply sign document without extra_data.
 
 ::
+
     function pushRevokeDocument(bytes32 _SignatureHash, string calldata _reason)
 Request to add a "revoked" statement on the signature, and add a reason for that (can be then displayed on clients).
