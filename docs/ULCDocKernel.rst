@@ -55,23 +55,18 @@ In order to officially sign a document, you have at least two steps :
   When you push a document into your Kernel, you automatically confirm it. So, if you use a simple signature Kernel, your document is signed with only one transaction.
 
 ::
-    
-    pragma solidity >=0.5.2 <0.6.0;
+    struct Document {
+          bool initialized;
+          bool signed;
+          bool revoked;
 
-    contract ULCDocKernel {
-        struct Document {
-              bool initialized;
-              bool signed;
-              bool revoked;
+          uint256 signed_date;
+          uint256 revoked_date;
+          uint16 document_family;
 
-              uint256 signed_date;
-              uint256 revoked_date;
-              uint16 document_family;
-
-              string revoked_reason;
-              string source;
-              string extra_data;
-        }
+          string revoked_reason;
+          string source;
+          string extra_data;
     }
 
 By default, the EVM makes all var set to ``false``, ``0``, or ``""``.
