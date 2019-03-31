@@ -18,7 +18,7 @@ General specification
 
 Multi-Owner and Multi-Operator ability
 --------------------------------------
-For most of important organization, only one person can't do dangerous actions alone, such as signing an official document. In this way, the kernel has the ability to wait for multiple **confirmation** before doing important stuff, like publishing a signature, or changing critical configuration parameters.
+For most of important organization, only one person can't do dangerous actions alone, such as signing an official document. In this way, the kernel has the ability to wait for multiple **confirmations** before doing important stuff, like publishing a signature, or changing critical configuration parameters.
 
 Roles
 ^^^^^
@@ -55,6 +55,7 @@ In order to officially sign a document, you have at least two steps :
   When you push a document into your Kernel, you automatically confirm it. So, if you use a simple signature Kernel, your document is signed with only one transaction.
 
 ::
+    
     pragma solidity >=0.5.2 <0.6.0;
 
     contract ULCDocKernel {
