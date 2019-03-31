@@ -55,24 +55,27 @@ In order to officially sign a document, you have at least two steps :
   When you push a document into your Kernel, you automatically confirm it. So, if you use a simple signature Kernel, your document is signed with only one transaction.
 
 ::
-    
-    struct Document {
-          bool initialized;
-          bool signed;
-          bool revoked;
+    pragma solidity >=0.5.2 <0.6.0;
 
-          uint256 signed_date;
-          uint256 revoked_date;
-          uint16 document_family;
+    contract ULCDocKernel {
+        struct Document {
+              bool initialized;
+              bool signed;
+              bool revoked;
 
-          string revoked_reason;
-          string source;
-          string extra_data;
+              uint256 signed_date;
+              uint256 revoked_date;
+              uint16 document_family;
+
+              string revoked_reason;
+              string source;
+              string extra_data;
+        }
     }
 
 By default, the EVM makes all var set to ``false``, ``0``, or ``""``.
 
-* ``initialized`` is set to ``true`` as soon as someone started to try signing a document. When ``initialized`` is activated, you can't push an another version of the document. It's a security to prevent **deleting**, **cheating** about the fact that you sign some extra data, document family and so on.
+* ``initialized`` is set to ``true`` as soon as someone started to try signing a document. When it is activated, you can't push an another version of the document. It's a security to prevent **deleting**, **cheating** about the fact that you sign some extra data, document family and so on.
 
 .. info::
   As long as the document is not yet **signed**, you can request to **clean document state** and it will reset the document.
@@ -94,6 +97,7 @@ Find a signature
 ^^^^^^^^^^^^^^^^
 
 ::
+
     mapping(bytes32 => Document) public Signatures_Book;
 
 To find a signature, you need its ``bytes32`` code. To obtain it, just check the ``Hash_Algorithm`` string. By default, ULCDocKernel uses **SHA3-256** hash of the document.
@@ -111,7 +115,9 @@ Pushing something is the first step to do someting with the data.
 
 ::
 
-    function pushDocument(bytes32 _SignatureHash, string memory _source, uint16 _indexDocumentFamily, string memory _extra_data)
+    function pushDocument(bytes32 _SignatureHash, string memory _source, uint16 _indexDocumentFamily, string memory _extra_data){
+        //stuff...
+    }
 Push a signature into the Signature's Book. Then, you need to confirm it before changing ``sign`` state to ``true``.
 
 .. note::
@@ -119,10 +125,14 @@ Push a signature into the Signature's Book. Then, you need to confirm it before 
 
 ::
 
-    function confirmDocument(bytes32 _SignatureHash)
+    function confirmDocument(bytes32 _SignatureHash){
+        //stuff...
+    }
 Request to confirm a signature. It can also be used to simply sign document without extra_data.
 
 ::
 
-    function pushRevokeDocument(bytes32 _SignatureHash, string calldata _reason)
+    function pushRevokeDocument(bytes32 _SignatureHash, string calldata _reason){
+        //stuff...
+    }
 Request to add a "revoked" statement on the signature, and add a reason for that (can be then displayed on clients).
