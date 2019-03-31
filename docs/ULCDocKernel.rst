@@ -2,7 +2,7 @@ ULCDocKernel
 ====================
 
 Summary
-=======
+-------
 
 Each organisation or individual has to publish his own *ULCDocKernel* smart contract. The kernel part is used to explicitly publish signatures to blockchain.
 So, the owner of ULCDocKernel has a complete and independent way to certify documents.
@@ -24,6 +24,7 @@ Roles
 ^^^^^
 
 ULCDocKernel has 2 floors of administrative process :
+
 * ``owners`` that are administrators of the Smart Contract. They can change configuration parameters.
 * ``operators`` that can only push, confirm and revoke signatures.
 
@@ -43,37 +44,39 @@ How signatures are stored
 Signature Structure
 ^^^^^^^^^^^^^^^^^^^
 
-ULCDocKernel has a struct called *Document* which has all information about a signed document.
+ULCDocKernel has a struct called ``Document`` which has all information about a signed document.
 
 In order to officially sign a document, you have at least two steps :
+
 1. Push a *document struct* into a mapping
 2. Confirm the *document struct* with at least ``operatorsForChange`` number of ``operators``.
 
 .. note::
   When you push a document into your Kernel, you automatically confirm it. So, if you use a simple signature Kernel, your document is signed with only one transaction.
 
-``struct Document {
-      bool initialized;
-      bool signed;
-      bool revoked;
+::
+    struct Document {
+          bool initialized;
+          bool signed;
+          bool revoked;
 
-      uint256 signed_date;
-      uint256 revoked_date;
-      uint16 document_family;
+          uint256 signed_date;
+          uint256 revoked_date;
+          uint16 document_family;
 
-      string revoked_reason;
-      string source;
-      string extra_data;
-}``
+          string revoked_reason;
+          string source;
+          string extra_data;
+    }
 
 By default, the EVM makes all var set to ``false``, ``0``, or ``""``.
 
-* ``initialized`` is set to ``true`` as soon as someone started to try signing a document. When ``initialized`` is activated, you can't push an another version of the document. It's a security to prevent **deleting**,**cheating** about the fact that you sign some extra data, document family and so on.
+* ``initialized`` is set to ``true`` as soon as someone started to try signing a document. When ``initialized`` is activated, you can't push an another version of the document. It's a security to prevent **deleting**, **cheating** about the fact that you sign some extra data, document family and so on.
 
 .. info::
   As long as the document is not yet **signed**, you can request to **clean document state** and it will reset the document.
 
-* ``signed`` is set to ``true`` as long as the document has enough confirmations. It's the only field you need to trust to know if something has been signed or not.
+* ``signed`` is set to ``true`` as long as the document has enough confirmations. **It's the only field you need to trust to know if something has been signed or not.**
 * ``revoked`` is set to ``true`` as long as the document has enough revoke request from operators.
 
 .. info::
@@ -89,7 +92,8 @@ By default, the EVM makes all var set to ``false``, ``0``, or ``""``.
 Find a signature
 ^^^^^^^^^^^^^^^^
 
-``mapping(bytes32 => Document) public Signatures_Book;``
+::
+    mapping(bytes32 => Document) public Signatures_Book;
 
 To find a signature, you need its ``bytes32`` code. To obtain it, just check the ``Hash_Algorithm`` string. By default, ULCDocKernel uses **SHA3-256** hash of the document.
 
@@ -104,14 +108,17 @@ Pusher functions
 ^^^^^^^^^^^^^^^^
 Pushing something is the first step to do someting with the data.
 
-``function pushDocument(bytes32 _SignatureHash, string memory _source, uint16 _indexDocumentFamily, string memory _extra_data)``
+::
+    function pushDocument(bytes32 _SignatureHash, string memory _source, uint16 _indexDocumentFamily, string memory _extra_data)
 Push a signature into the Signature's Book. Then, you need to confirm it before changing ``sign`` state to ``true``.
 
 .. note::
   When you push a document into your Kernel, you automatically confirm it. So, if you use a simple signature Kernel, your document is signed with only one transaction.
 
-``function confirmDocument(bytes32 _SignatureHash)``
+::
+    function confirmDocument(bytes32 _SignatureHash)
 Request to confirm a signature. It can also be used to simply sign document without extra_data.
 
-``function pushRevokeDocument(bytes32 _SignatureHash, string calldata _reason)``
+::
+    function pushRevokeDocument(bytes32 _SignatureHash, string calldata _reason)
 Request to add a "revoked" statement on the signature, and add a reason for that (can be then displayed on clients).
