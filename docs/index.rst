@@ -6,6 +6,9 @@
 Welcome to ULCD's documentation
 ========================================
 
+.. important::
+  **The documentation is not complete yet. It can contain (many) spelling mistakes and may change in near future.**
+
 The first goal of this documentation is to explain main mechanism of ULCDocuments in Ethereum blockchain. Then, everybody will be able to develop WebApp or software that is able to interact with ULCDocuments.
 
 The source code of the project is available `here <https://github.com/blockchain-elite/ULCDocumentsCore>`_
@@ -30,18 +33,15 @@ The aim of ULCDocuments is to be an open source project, used on many projects t
 
 Then, everybody is welcome to create **extensions for PDF**, **Office/LibreOffice plugin**, **native applications** that work with ULCDocuments !
 
-Moreover, feel free to create projects that include ULCDocuments verification in order to trust signature of a third party. You can use and/or create many JSON standards like [Open Badges](https://www.imsglobal.org/sites/default/files/Badges/OBv2p0Final/index.html) with ULCDocuments !
+Moreover, feel free to create projects that include ULCDocuments verification in order to trust signature of a third party. You can use and/or create many JSON standards like `Open Badges <https://www.imsglobal.org/sites/default/files/Badges/OBv2p0Final/index.html>`_ with ULCDocuments !
 
-For the moment, we've created a WebApp that implement ULCDocumentsCore at [https://ulcdocuments.blockchain-elite.fr/](https://ulcdocuments.blockchain-elite.fr/)
+For the moment, we've created a WebApp that implement ULCDocumentsCore at `https://ulcdocuments.blockchain-elite.fr/ <https://ulcdocuments.blockchain-elite.fr/>`_
 
 Who is behind the project ?
 -----------------------------
 
-ULCDocuments is a project developped by `Blockchain Elite Labs <https://www.blockchain-elite.fr/>`_ . The goal is to create some experimental tools based on Blockchain that are open-source, to promote Blockchain Elite know-how.
+ULCDocuments is a project developped by `Blockchain Elite Labs <https://www.blockchain-elite.fr/labs/>`_ . The goal is to create some experimental tools based on Blockchain that are open-source, to promote Blockchain Elite know-how.
 
-
-.. important::
-  **The documentation is not complete yet. It can contain (many) spelling mistakes and may change in near future.**
 
 .. toctree::
    :maxdepth: 2
