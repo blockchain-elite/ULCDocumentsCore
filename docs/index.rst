@@ -6,6 +6,8 @@
 Welcome to ULCD's documentation
 ========================================
 
+.. image:: img/ULCD_banner.png
+
 .. important::
   **The documentation is not complete yet. It can contain (many) spelling mistakes and may change in near future.**
 
