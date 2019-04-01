@@ -19,7 +19,7 @@ In order to do something on the Smart Contract, like **signing** or **changing p
 .. warning::
   An account can't be ``owner`` and ``operator`` at the same time.
 
-By default, ULCDocKernel is configurated to work with one owner account. So, is you use the kernel with only one owner, the request part is totally transparent and your requests are done immediately.
+By default, ULCDocKernel is configurated to work with one owner account. So, is you use the kernel with only one owner, the request part is totally transparent and then they are done immediately.
 
 
 How the requester works
@@ -89,31 +89,25 @@ Functions available
 Basic setters
 ^^^^^^^^^^^^^
 ::
-  //Both need enough confirmation (they are requester too)
-  function  setOperatorsForChange(uint256 _nb) external onlyOwner {
-  }
 
-  function setOwnersForChange(uint256 _nb) external onlyOwner {
-  }
+  //Both need enough confirmations (they are requester too)
+  function  setOperatorsForChange(uint256 _nb) external onlyOwner {}
+
+  function setOwnersForChange(uint256 _nb) external onlyOwner {}
 
 Requester
 ^^^^^^^^^
 ::
 
-  function requestAddOwner(address _newOwner) external onlyOwner{
-  }
+  function requestAddOwner(address _newOwner) external onlyOwner{}
 
-  function requestAddOperator(address _newOperator) external onlyOwner {
-  }
+  function requestAddOperator(address _newOperator) external onlyOwner {}
 
-  function requestChangeOwner(address _oldOwner, address _newOwner) external onlyOwner{
-  }
+  function requestChangeOwner(address _oldOwner, address _newOwner) external onlyOwner{}
 
-  function requestRemoveOwner(address _removableOwner) external onlyOwner{
-  }
+  function requestRemoveOwner(address _removableOwner) external onlyOwner{}
 
-  function requestRemoveOperator(address _removableOperator) external onlyOwner{
-  }
+  function requestRemoveOperator(address _removableOperator) external onlyOwner{}
 
 .. info::
   Don't forget to update ``ownersForChange`` or ``operatorsForChange`` if you want to modify number of confirmations before doing an action.
@@ -123,17 +117,13 @@ Getters
 ::
 
   //Returns all adresses who approved the keccak256 operator request
-  function getOperatorRequest(bytes32 _theKey) external view returns(address[] memory) {
-  }
+  function getOperatorRequest(bytes32 _theKey) external view returns(address[] memory) {}
 
   //Returns numbers of operators who confirmed the keccak256 request.
-  function getOperatorRequestLength(bytes32 _theKey) external view returns(uint256) {
-  }
+  function getOperatorRequestLength(bytes32 _theKey) external view returns(uint256) {}
 
   //Returns all adresses who approved the keccak256 owner request
-  function getOwnerRequest(bytes32 _theKey) external view returns(address[] memory) {
-  }
+  function getOwnerRequest(bytes32 _theKey) external view returns(address[] memory) {}
 
   //Returns numbers of owners who confirmed the keccak256 request.
-  function getOwnerRequestLength(bytes32 _theKey) external view returns(uint256) {
-  }
+  function getOwnerRequestLength(bytes32 _theKey) external view returns(uint256) {}

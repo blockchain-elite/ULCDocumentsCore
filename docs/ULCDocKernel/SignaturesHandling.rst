@@ -7,6 +7,7 @@ Signature Structure
 ULCDocKernel has a struct called ``Document`` which has all information about a signed document.
 
 ::
+
     struct Document {
           bool initialized;
           bool signed;
@@ -50,8 +51,9 @@ Find a signature
 
 To find a signature, you need its ``bytes32`` code. To obtain it, just check the ``Hash_Algorithm`` string. By default, ULCDocKernel uses **SHA3-256** hash of the document.
 
-.. info::
+.. note::
   Because ``mapping`` hashes its key with a *32 bytes* format, it is useless to use hash algorithm with more than *32 bytes* output like SHA3-512.
+
 
 Constructor
 -----------
@@ -91,21 +93,18 @@ Pushing something is the first step to do sign a document with data. Then, you n
 
 ::
 
-  function pushDocument(bytes32 _SignatureHash, string memory _source, uint16 _indexDocumentFamily, string memory _extra_data) public atLeastOperator whenNotPaused notUpgraded{
-    }
+  function pushDocument(bytes32 _SignatureHash, string memory _source, uint16 _indexDocumentFamily, string memory _extra_data) public atLeastOperator whenNotPaused notUpgraded{}
 
 .. note::
   When you push a document into your Kernel, you automatically confirm it. So, if you use a simple signature Kernel, your document is signed with only one transaction.
 
 ::
+
     //Request to confirm a signature. It can also be used to simply sign document without extra_data.
-    function confirmDocument(bytes32 _SignatureHash) public atLeastOperator whenNotPaused notUpgraded{
-    }
+    function confirmDocument(bytes32 _SignatureHash) public atLeastOperator whenNotPaused notUpgraded{}
 
     //Request to add a "revoked" statement on the signature, and add a reason for that (can be then displayed on clients).
-    function pushRevokeDocument(bytes32 _SignatureHash, string calldata _reason) external atLeastOperator whenNotPaused {
-    }
+    function pushRevokeDocument(bytes32 _SignatureHash, string calldata _reason) external atLeastOperator whenNotPaused {}
 
     //Request to confirm a revoke statement. It can also be used to simply revoke document without reason
-    function confirmRevokeDocument(bytes32 _SignatureHash) external atLeastOperator whenNotPaused {
-    }
+    function confirmRevokeDocument(bytes32 _SignatureHash) external atLeastOperator whenNotPaused {}

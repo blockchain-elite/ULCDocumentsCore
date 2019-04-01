@@ -5,7 +5,7 @@ ULCDocKernel
 Summary
 =======
 
-Each organisation or individual has to publish his own *ULCDocKernel* smart contract. The kernel part is used to explicitly publish signatures to blockchain.
+Each organisation or individual has to publish his own **ULCDocKernel** smart contract. The kernel part is used to explicitly publish signatures to blockchain.
 So, the owner of ULCDocKernel has a complete and independent way to certify documents.
 
 The kernel has different features :
