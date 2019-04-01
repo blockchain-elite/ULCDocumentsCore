@@ -24,6 +24,8 @@ Who's is behind the project ?
 ULCDocuments is a project developped by `Blockchain Elite Labs <https://www.blockchain-elite.fr/>`_ . The goal is to create some experimental tools based on Blockchain that are open-source, to promote Blockchain Elite know-how.
 
 
+.. important::
+  **The documentation is not complete yet. It can contain (many) spelling mistakes and may change in near future.**
 
 .. toctree::
    :maxdepth: 2
