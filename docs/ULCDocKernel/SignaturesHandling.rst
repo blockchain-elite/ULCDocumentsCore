@@ -16,6 +16,7 @@ ULCDocKernel has a struct called ``Document`` which has all information about a 
           uint256 signed_date;
           uint256 revoked_date;
           uint16 document_family;
+          uint8 signature_version;
 
           string revoked_reason;
           string source;
@@ -38,6 +39,7 @@ By default, the EVM makes all var set to ``false``, ``0``, or ``""``.
 * ``signed_date`` is the UNIX timestamp (result of ``block.timestamp`` in solidity) of the block where signature has been officially signed.
 * ``revoked_date`` is the UNIX timestamp (result of ``block.timestamp`` in solidity) of the block where revoked state has been officially declared.
 * ``document_family`` is the index of the array where is stored the string value.
+* ``signature_version`` is the version of the Kernel who host the signature (for migration purposes)
 * ``revoked_reason`` is defined by operators when they push a revoke statement.
 * ``source`` is defined by operators when they push document. It is the location where we can find the document if it's public.
 * ``extra_data`` is defined by operators when they push document. It is a free location with ``param:value,param2:value2``. It can be used to add extra information for automatic process, or to be compatible with newer Kernel Version.
@@ -47,12 +49,12 @@ Find a signature
 
 ::
 
-    mapping(bytes32 => Document) public Signatures_Book;
+    mapping(bytes32 => Document) public SIGNATURES_BOOK;
 
-To find a signature, you need its ``bytes32`` code. To obtain it, just check the ``Hash_Algorithm`` string. By default, ULCDocKernel uses **SHA3-256** hash of the document.
+To find a signature, you need its ``bytes32`` code. To obtain it, just check the ``HASH_ALGORITHM`` string. By default, ULCDocKernel uses **SHA3-256** hash of the document.
 
 .. note::
-  Because ``mapping`` hashes its key with a *32 bytes* format, it is useless to use hash algorithm with more than *32 bytes* output like SHA3-512.
+  Because ``mapping`` hashes its key with a *32 bytes* format, it is useless to use hash algorithm with more than *32 bytes* output like ``SHA3-512``*.
 
 
 Constructor
@@ -61,7 +63,7 @@ Constructor
 ::
 
   constructor() public {
-      Hash_Algorithm = "SHA3-256";
+      HASH_ALGORITHM = "SHA3-256";
   }
 
 Variables available
@@ -69,10 +71,10 @@ Variables available
 
 ::
 
-  uint256 public Document_Counter; // stat purposes only
-  string public Hash_Algorithm; //Essential Information to know how to hash files
+  uint256 public DOCUMENTS_COUNTER; // stat purposes only
+  string public HASH_ALGORITHM; //Essential Information to know how to hash files
 
-  string[] public document_family_registred = ["Undefined",
+  string[] public DOC_FAMILY_LIST = ["Undefined",
   "Diploma",
   "Bill",
   "Order",
@@ -82,9 +84,13 @@ Variables available
   "Image",
   "Audio",
   "Video",
-  "Binary"];
+  "Binary",
+  "Text"];
 
-  mapping(bytes32 => Document) public Signatures_Book;
+  // Stringified version to get all array in one .call()
+  string public DOC_FAMILY_STRINGIFIED = "Undefined,Diploma,Bill,Order,Letter,Publication,Code,Image,Audio,Video,Binary,Text";
+
+  mapping(bytes32 => Document) public SIGNATURES_BOOK;
 
 Function List
 -------------
@@ -98,7 +104,12 @@ Pushing something is the first step to do sign a document with data. Then, you n
 .. note::
   When you push a document into your Kernel, you automatically confirm it. So, if you use a simple signature Kernel, your document is signed with only one transaction.
 
+
+
 ::
+
+    //Return the size of the DOC_FAMILY_LIST array
+    function getDocFamilySize() public view returns(uint256) {}
 
     //Request to confirm a signature. It can also be used to simply sign document without extra_data.
     function confirmDocument(bytes32 _SignatureHash) public atLeastOperator whenNotPaused notUpgraded{}
@@ -108,3 +119,12 @@ Pushing something is the first step to do sign a document with data. Then, you n
 
     //Request to confirm a revoke statement. It can also be used to simply revoke document without reason
     function confirmRevokeDocument(bytes32 _SignatureHash) external atLeastOperator whenNotPaused {}
+
+You can also request multiple signature with only one transaction using theses functions :
+
+::
+
+    function confirmDocumentList(bytes32[] calldata _allKeys) external atLeastOperator whenNotPaused notUpgraded {}
+
+    //Because we can't use string[] with standard ABI, lightPushDocumentList allow to push doc that have only a documentFamily set.
+    function lightPushDocumentList(bytes32[] calldata _allKeys, uint16[] calldata _allDocumentFamily) external atLeastOperator whenNotPaused notUpgraded {}

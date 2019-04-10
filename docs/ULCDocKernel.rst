@@ -17,3 +17,5 @@ The kernel has different features :
 .. include:: ULCDocKernel/MultiRoles.rst
 
 .. include:: ULCDocKernel/SignaturesHandling.rst
+
+.. include:: ULCDocKernel/SecuritySignatures.rst
