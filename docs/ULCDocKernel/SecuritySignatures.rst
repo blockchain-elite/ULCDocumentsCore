@@ -21,18 +21,18 @@ Possible recovery
 Clean compromised accounts
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-First remove all compromised ``owners`` and ``operators`` with associated functions (see :ref:`**MultiRoles <MultiRoles>**`).
+First remove all compromised ``owners`` and ``operators`` with associated functions (see :ref:`MultiRoles <MultiRoles>`).
 
 You need now to have ``operatorsForChange`` available accounts.
 
 Clean requests
 ^^^^^^^^^^^^^^
 
-If attacker started to sign documents (but can't confirm it as he does't have enough accounts), then you need to clear it by using ``clearDocument`` function.
+If attacker started to sign documents (but can't confirm it, as he does't have enough accounts), then you need to clear it by using ``clearDocument`` function.
 
 ::
 
-    function clearRevokeProcess(bytes32 _SignatureHash) external atLeastOperator notUpgraded whenNotPaused {}
+    function clearDocument(bytes32 _SignatureHash) external atLeastOperator notUpgraded whenNotPaused {}
 
 .. note::
     You can't clear a document if it is already signed or revoked.
@@ -49,7 +49,7 @@ If attacker started to revoke documents you can also clear the request (and dele
 If attacker started to request a selfdestruct, you can clear the requester counter :
 
 ::
-    
+
     //note : only a compromised owner account can request kill().
     function clearKill() external onlyOwner {}
 
