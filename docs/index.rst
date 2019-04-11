@@ -9,11 +9,11 @@ Welcome to ULCD's documentation
 .. image:: img/ULCD_banner.png
 
 .. important::
-  **The documentation is not complete yet. It can contain (many) spelling mistakes and may change in near future.**
+  **The documentation is not complete yet. It may change in near future.**
 
-The first goal of this documentation is to explain main mechanism of ULCDocuments in Ethereum blockchain. Then, everybody will be able to develop WebApp or software that is able to interact with ULCDocuments.
+The main goal of this documentation is to explain the mechanism behind ULCDocuments, on the Ethereum blockchain. This will allow anyone to develop their own WebApp or software to interact with ULCDocuments.
 
-The source code of the project is available `here <https://github.com/blockchain-elite/ULCDocumentsCore>`_
+This documentation's source code is available `here <https://github.com/blockchain-elite/ULCDocumentsCore>`_
 
 .. note::
     For the beta version, full source code of *smart contracts* are not avaiable.
@@ -21,28 +21,27 @@ The source code of the project is available `here <https://github.com/blockchain
 What is ULCDocuments ?
 ----------------------
 
-ULCDocuments is an open-source software based on Ethereum blockchain. It gives to everybody a tool to sign all type of documents permanantly.
+ULCDocuments is an Free and Open-Source software using the Ethereum blockchain. The goal to make it easy for anyone to sign any type of document permanantly on the blockchain.
 
-ULC is acronym of **U**\ltra **L**\ow **C**\ost. The goal is to provide a very cheap way to use the blockchain, by providing free source code.
-ULCDocuments is a set of 2 Ethereum smart contract that has to be deployed by different actors to respect decentralized aspect. First, you need to pay once fees to be recorgnased by an authority. Then, you only pay Ethereum gaz and transaction fees.
+ULC is the acronym for **U**\ltra **L**\ow **C**\ost. We aim to provide a very cheap way to certify documents: you only need to pay transactions fees determined by the blockchain when sending signatures.
+
+ULCDocuments is composed of 2 Ethereum smart contracts. They should be deployed by different actors to respect the decentralized aspect of the blockchain.
 
 
-Why using ULCDocuments ?
+Why use ULCDocuments ?
 ------------------------
-Using ULCDocuments instead of simply send a transaction with your hash as data let the possibility for developers to **create tools or other smart contracts that can interact easier with your signatures**.
+Using ULCDocuments instead of simply sending a transaction with your hash as data gives developers the possibility to **create tools or other smart contracts which can then interact easily with your signatures**.
 
-The aim of ULCDocuments is to be an open source project, used on many projects to **create an powerfull tool to get interaction between people' signatures.**
+We aim to create an open source project, used by many other projects, in order to **create a powerfull tool allowing interaction between people's signatures**. For example, anyone could create **extensions for PDF**, **Office/LibreOffice plugin**, **native applications** working with ULCDocuments!
 
-Then, everybody is welcome to create **extensions for PDF**, **Office/LibreOffice plugin**, **native applications** that work with ULCDocuments !
+Feel free to create your own project using ULCDocuments verification in order to trust signature of a third party. You can also use and/or create many JSON standards like `Open Badges <https://www.imsglobal.org/sites/default/files/Badges/OBv2p0Final/index.html>`_ with ULCDocuments!
 
-Moreover, feel free to create projects that include ULCDocuments verification in order to trust signature of a third party. You can use and/or create many JSON standards like `Open Badges <https://www.imsglobal.org/sites/default/files/Badges/OBv2p0Final/index.html>`_ with ULCDocuments !
-
-For the moment, we've created a WebApp that implement ULCDocumentsCore at `https://ulcdocuments.blockchain-elite.fr/ <https://ulcdocuments.blockchain-elite.fr/>`_
+To showcase this technology, and to give an example of an application using ULCDocuments, we have created a WebApp implementing ULCDocumentsCore at `https://ulcdocuments.blockchain-elite.fr/ <https://ulcdocuments.blockchain-elite.fr/>`_
 
 Who is behind the project ?
 -----------------------------
 
-ULCDocuments is a project developped by `Blockchain Elite Labs <https://www.blockchain-elite.fr/labs/>`_ . The goal is to create some experimental tools based on Blockchain that are open-source, to promote Blockchain Elite know-how.
+ULCDocuments is a project developped by `Blockchain Elite Labs <https://www.blockchain-elite.fr/labs/>`_ . The Labs section from BLockchain Elite aims to create some experimental Open-Source tools based on the Blockchain technology, and to promote Blockchain Elite know-how.
 
 
 .. toctree::

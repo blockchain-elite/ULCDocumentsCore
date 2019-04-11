@@ -1,7 +1,5 @@
-# ULCDocumentsCore
+# ULC Documents Core
 
-In this repo you will find source code of the smart contract that make ULCDocuments. Moreover, you will find a full documentation of how smart contracts work in order to create personalised API or applications that use ULCDocuments.
+In this repo you will find the source code of the smart contracts used by ULCDocuments. You will also find a full documentation of how smart contracts work in order to create personalised API or applications using ULCDocuments.
 
-# Documentation URL
-
-Full documention is avaiable here : https://ulcdocumentscore.readthedocs.io/en/latest/index.html
+**Full documention is avaiable here : https://ulcdocumentscore.readthedocs.io/en/latest/index.html**
