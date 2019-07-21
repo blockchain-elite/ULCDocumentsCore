@@ -17,7 +17,7 @@ along with ULCDocuments Web App.  If not, see <http://www.gnu.org/licenses/>.
 *  Dev Entity: Blockchain-Elite (https://www.blockchain-elite.fr/)
 */
 
-function ULCDocAPI(_Web3Provider) {
+function ULCDocAPI(_ManualWeb3) {
 
 
     //Array of all compatible contract version of this Interactor.
@@ -40,9 +40,9 @@ function ULCDocAPI(_Web3Provider) {
     }
 
     /** @dev function that deserialise extra_dataV5 field input
-      @param {String} raw_extra_data the raw extra data
-     @return {Map} the map with extra_datas properties loaded
-     */
+    @param {String} raw_extra_data the raw extra data
+    @return {Map} the map with extra_datas properties loaded
+    */
     formatExtraDataV5 = function (raw_extra_data){
         let extra_data_table = raw_extra_data.split(',');
         let result = new Map();
@@ -69,7 +69,55 @@ function ULCDocAPI(_Web3Provider) {
     }
 
     //the web3 instance we're going to use in this Interactor.
-    let Web3Obj = _Web3Provider;
+    let Web3Obj;
+    let isUsingInjector = false;
+    let isReady = false;
+    let whichNetwork = -1;
+
+    /** @title Function that says if the API is ready to work.
+    @return {Bool} */
+    this.isReady = function() {
+        return isReady;
+    }
+
+    this.getNetwork = function() {
+        return whichNetwork;
+    }
+
+    function usingInjector() {
+        return (typeof web3 !== 'undefined')
+    }
+
+    function getInfuraRopstenWeb3() {
+        return new Web3("wss://ropsten.infura.io/ws");
+    }
+
+    function getInfuraMainnetWeb3(){
+        return new Web3("wss://mainnet.infura.io/ws");
+    }
+
+    //constructor
+    if(typeof _ManualWeb3 === 'undefined'){
+        //then use injected web3, or throw
+
+        if (!usingInjector()){
+            throw new Error("Web3 is not defined and not provided.")
+        }
+
+        else {
+            Web3Obj = new Web3(Web3.givenProvider);
+            isUsingInjector = true;
+            whichNetwork = web3.version.getNetwork();
+            isReady = true;
+        }
+
+    }
+
+    else {
+        Web3Obj = _ManualWeb3;
+        whichNetwork = Web3Obj.version.getNetwork();
+        isReady = true;
+    }
 
     /**
     @dev This Object can interact through ULCDocKernel, without Web3 knowledge.
@@ -118,7 +166,7 @@ function ULCDocAPI(_Web3Provider) {
 
 
         /** @Title Function that return the previous ULCDocKernel object.
-            @Throw if the previous kernel is null
+        @Throw if the previous kernel is null
         */
         this.getPreviousKernel = async function() {
 
@@ -137,8 +185,8 @@ function ULCDocAPI(_Web3Provider) {
         }
 
         /**
-            @Title Function that check if current kernel has declared previous one.
-            @return {Bool}
+        @Title Function that check if current kernel has declared previous one.
+        @return {Bool}
         */
         this.hasPreviousKernel = async function() {
 
@@ -153,7 +201,7 @@ function ULCDocAPI(_Web3Provider) {
         }
 
         /** @Title Function that return the next ULCDocKernel object.
-            @Throw if the next kernel is null
+        @Throw if the next kernel is null
         */
         this.getNextKernel = async function() {
 
@@ -172,8 +220,8 @@ function ULCDocAPI(_Web3Provider) {
         }
 
         /**
-            @Title Function that check if current kernel has declared previous one.
-            @return {Bool}
+        @Title Function that check if current kernel has declared previous one.
+        @return {Bool}
         */
         this.hasNextKernel = async function() {
 
@@ -218,6 +266,7 @@ function ULCDocAPI(_Web3Provider) {
         @Warn Can throw different errors :
         @Throw KernelVersionError if the version of the kernel is not compatible with the API.
         @Throw KernelLoadError if we can't reach minimal functionnalities.
+        @return Kernel_Config object
         */
         this.connect = async function () {
             //First we only load the versionner to know kernel version.
@@ -264,7 +313,8 @@ function ULCDocAPI(_Web3Provider) {
 
 
         /**
-            @Title Function that check if the current address can sign a document in the kernel
+        @Title Function that check if the current address can sign a document in the kernel
+        @return bool
         */
         this.isAtleastOperator = async function(_Address) {
             let isOwner = false;
@@ -289,6 +339,7 @@ function ULCDocAPI(_Web3Provider) {
                 this.signed_date = 0;
                 this.revoked_date = 0;
                 this.document_family = "";
+                this.document_family_id = 0;
                 this.initialized = false;
                 this.signed = false;
                 this.revoked = false;
@@ -313,8 +364,8 @@ function ULCDocAPI(_Web3Provider) {
             }
 
             /**
-             @Title Function that return a DocumentV5 complete infos. Requests are optimized.
-             */
+            @Title Function that return a DocumentV5 complete infos. Requests are optimized.
+            */
             async function loadDocumentInfoV5(){
 
                 let initialized = await Kernel_Contract.methods.isInitialized(_SignatureHash).call();
@@ -406,16 +457,100 @@ function ULCDocAPI(_Web3Provider) {
 
                 }
                 else {
-                    document_obj.extra_data = extraDataFormatV5(_extras);
-
+                    document_obj.extra_data = _extras;
                 }
                 //Chaining option avaiable.
                 return this;
             }
+
+            this.setDocumentFamily  = function(_DocID){
+                document_obj.document_family_id = _DocID;
+                return this;
+            }
+
+        }
+
+        function documentSignQueue(_callBackTxHash, _callBackReceipt, _callBackError) {
+
+            let whenError = _callBackError;
+            let whenTxHash = _callBackTxHash;
+            let whenReceipt = _callBackReceipt;
+
+            let documentList = new Map();
+
+            this.addDoc = function(_DocToSign, _identifier) {
+                documentList.set(_identifier, _DocToSign);
+                return this;
+            }
+
+
+            //@TODO faire les sous fonctions
+
+
+            this.requestSign = function(_Optimized = true) {
+
+                //empty 2D array (hash, index)
+                let confirmArray = [[],[]];
+
+                //empty 2D arrays (hash, info, index)
+                let lightPushArray = [[],[],[]];
+                let pushArray = [[],[],[],[],[]];
+
+                //We assume here all conditions are filled (if we force here then blockchain security will handle it)
+
+
+                //for each sign request
+                for(i of documentList){
+
+                    let oneDoc = i[1];
+                    let oneID = i[0];
+
+                    //need to set type of action.
+                    if(oneDoc.source === "" && oneDoc.extra_data.size === "" && oneDoc.document_family_id === 0){
+                        //no Info, simple confirmation then.
+                        confirmArray[0].push(oneDoc.hash);
+                        confirmArray[1].push(oneID);
+                    }
+                    else {
+                        if(oneDoc.source === "" && oneDoc.extra_data.size === 0){
+                            //no source and extra data mean no string array so we can call light pushDoc.
+                            lightPushArray[0].push(oneDoc.hash);
+                            lightPushArray[1].push(oneDoc.document_family_id);
+                            lightPushArray[2].push(oneID);
+                        }
+                        else {
+                            //else it gonna be simple pushing.
+                            pushArray[0].push(oneDoc.hash);
+                            pushArray[1].push(oneDoc.source);
+                            pushArray[2].push(oneDoc.document_family_id);
+                            pushArray[3].push(oneDoc.extra_data);
+                            pushArray[4].push(oneID);
+                        }
+                    }
+                }
+
+                //now execute it.
+                //for gaz opti, better to call one by one signing if only one item.
+                if(confirmArray[0].length > 0){
+                    (confirmArray[0].length > 1 && _Optimized) ? requestMultiConfirmDocs(confirmArray[0],confirmArray[1]) : requestConfirmDoc(confirmArray[0][0],confirmArray[1][0]);
+                }
+
+                if(lightPushArray[0].length > 0){
+                    (lightPushArray[0].length > 1 && _Optimized) ? requestMultiLightPushDocs(lightPushArray[0],lightPushArray[1],lightPushArray[2]) : requestPushDoc(lightPushArray[0][0], lightPushArray[1][0], lightPushArray[2][0]);
+                }
+
+                if(pushArray[0].length > 0){
+                    for (i in pushArray[0]){
+                        requestPushDoc(pushArray[0][i], pushArray[1][i], pushArray[2][i], pushArray[3][i], pushArray[4][i]);
+                    }
+                }
+            }
+
+
+
         }
 
 
-        }
     }
 
 }
