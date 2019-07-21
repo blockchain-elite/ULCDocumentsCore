@@ -13,7 +13,7 @@
   You should have received a copy of the GNU Lesser General Public License
   along with the   ULCDocApp Connector (ie: all files inside ABI folder)  . If not, see <http://www.gnu.org/licenses/>. */
 
-ULCDocModABI = [
+ULCDocModV3_ABI = [
   {
     "constant": true,
     "inputs": [

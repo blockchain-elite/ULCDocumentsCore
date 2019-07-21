@@ -13,7 +13,7 @@
   You should have received a copy of the GNU Lesser General Public License
   along with the   ULCDocuments Connector (ie: all files inside ABI folder)  . If not, see <http://www.gnu.org/licenses/>. */
 
-ULCDocKernelABI = [
+var ULCDocKernelV5_ABI = [
   {
     "constant": true,
     "inputs": [
@@ -465,6 +465,20 @@ ULCDocKernelABI = [
   {
     "constant": true,
     "inputs": [],
+    "name": "KERNEL_VERSION",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint16"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
     "name": "getDocFamilySize",
     "outputs": [
       {
@@ -687,6 +701,20 @@ ULCDocKernelABI = [
     "type": "function"
   },
   {
+    "constant": true,
+    "inputs": [],
+    "name": "PREVIOUS_KERNEL",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "constant": false,
     "inputs": [
       {
@@ -797,6 +825,20 @@ ULCDocKernelABI = [
       {
         "name": "",
         "type": "string"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "nextKernel",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
       }
     ],
     "payable": false,
