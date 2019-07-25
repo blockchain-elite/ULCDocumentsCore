@@ -17,11 +17,12 @@ along with ULCDocuments Web App.  If not, see <http://www.gnu.org/licenses/>.
 *  Dev Entity: Blockchain-Elite (https://www.blockchain-elite.fr/)
 */
 
-function ULCDocAPI(_ManualWeb3) {
+function ULCDocAPI() {
 
 
     //Array of all compatible contract version of this Interactor.
     const COMPATIBLE_MOD_VERSION = [3];
+    const COMPATIBLE_KERNEL_VERSION  = [5];
 
     function DependanciesError(message){
         this.constructor.prototype.__proto__ = Error.prototype;
@@ -34,9 +35,21 @@ function ULCDocAPI(_ManualWeb3) {
         this.BCE_MOD_ROPSTEN = "";
     }
 
-    const COMPATIBLE_KERNEL_VERSION  = [5];
+    this.getDefaultAddress = function() {
+        return DEFAULT_ADDRESS;
+    }
     this.getCompatibleKernelVersion = function () {
         return COMPATIBLE_KERNEL_VERSION;
+    }
+
+    this.getCompatibleModeratorVersion = function() {
+        return COMPATIBLE_MOD_VERSION;
+    }
+
+    this.getWalletAddress = async function() {
+        await ethereum.enable();
+        let localAccount = await Web3Obj.eth.getAccounts();
+        return localAccount;
     }
 
     /** @dev function that deserialise extra_dataV5 field input
@@ -58,6 +71,10 @@ function ULCDocAPI(_ManualWeb3) {
     * @return {String} serialized data */
     extraDataFormatV5 = function (mapExtraData){
         //WE ASSUME ':,' char are not used.
+        if(mapExtraData.size === 0){
+            return "";
+        }
+
         let result = "";
 
         for(key of mapExtraData.keys()){
@@ -70,53 +87,38 @@ function ULCDocAPI(_ManualWeb3) {
 
     //the web3 instance we're going to use in this Interactor.
     let Web3Obj;
-    let isUsingInjector = false;
-    let isReady = false;
-    let whichNetwork = -1;
-
-    /** @title Function that says if the API is ready to work.
-    @return {Bool} */
-    this.isReady = function() {
-        return isReady;
-    }
+    let whichNetwork = "";
 
     this.getNetwork = function() {
         return whichNetwork;
     }
 
-    function usingInjector() {
-        return (typeof web3 !== 'undefined')
+    this.usingInjector = function () {
+        return (typeof window.ethereum !== 'undefined');
     }
 
-    function getInfuraRopstenWeb3() {
+    this.getInfuraRopstenWeb3 = function() {
         return new Web3("wss://ropsten.infura.io/ws");
     }
 
-    function getInfuraMainnetWeb3(){
+    this.getInfuraMainnetWeb3 = function() {
         return new Web3("wss://mainnet.infura.io/ws");
     }
 
     //constructor
-    if(typeof _ManualWeb3 === 'undefined'){
+    if(typeof window.ethereum !== 'undefined'){
         //then use injected web3, or throw
-
-        if (!usingInjector()){
-            throw new Error("Web3 is not defined and not provided.")
-        }
-
-        else {
-            Web3Obj = new Web3(Web3.givenProvider);
-            isUsingInjector = true;
-            whichNetwork = web3.version.getNetwork();
-            isReady = true;
-        }
-
+        Web3Obj = new Web3(Web3.givenProvider);
+        isUsingInjector = true;
+        Web3Obj.eth.net.getNetworkType().then((result) => whichNetwork = result);
     }
 
     else {
+        if (typeof _ManualWeb3 === 'undefined'){
+            throw new Error("Web3 is not defined and not provided.")
+        }
         Web3Obj = _ManualWeb3;
-        whichNetwork = Web3Obj.version.getNetwork();
-        isReady = true;
+        Web3Obj.eth.net.getNetworkType().then((result) => whichNetwork = result);
     }
 
     /**
@@ -124,7 +126,7 @@ function ULCDocAPI(_ManualWeb3) {
     @dependancies Web3, ULCDocVersionner_ABI,ULCDocKernelV5_ABI, ULCDocModV3_ABI
     @constructor {String} _KernelAddress the address of the kernel.
     */
-    function ULCDocKernel (_KernelAddress) {
+    this.ULCDocKernel  = function (_KernelAddress) {
 
         function KernelVersionError(message) {
             this.constructor.prototype.__proto__ = Error.prototype;
@@ -164,6 +166,12 @@ function ULCDocAPI(_ManualWeb3) {
             return Kernel_Info;
         }
 
+        /** @Title Function to get the address of the object without loading KernelConfig.
+        @return {String} the address.
+        */
+        this.getRawAddress = function() {
+            return raw_address;
+        }
 
         /** @Title Function that return the previous ULCDocKernel object.
         @Throw if the previous kernel is null
@@ -171,13 +179,13 @@ function ULCDocAPI(_ManualWeb3) {
         this.getPreviousKernel = async function() {
 
             //We must check before that we have a kernel connected.
-            if(Kernel_Info.address === ""){
+            if(typeof Kernel_Info === 'undefined'){
                 throw new KernelQueryError("No kernel connected.");
             }
 
             let previousAddress = await Kernel_Contract.methods.PREVIOUS_KERNEL().call();
 
-            if (previousAddress === "0x0"){
+            if (previousAddress === "0x0000000000000000000000000000000000000000"){
                 throw new KernelLoadError("No previous kernel to load");
             }
 
@@ -190,14 +198,14 @@ function ULCDocAPI(_ManualWeb3) {
         */
         this.hasPreviousKernel = async function() {
 
-            if(Kernel_Info.address === ""){
+            if(typeof Kernel_Info === 'undefined'){
                 throw new KernelQueryError("No kernel connected.");
             }
 
             let previousAddress = await Kernel_Contract.methods.PREVIOUS_KERNEL().call();
 
 
-            return previousAddress !== "0x0";
+            return previousAddress !== "0x0000000000000000000000000000000000000000";
         }
 
         /** @Title Function that return the next ULCDocKernel object.
@@ -206,13 +214,13 @@ function ULCDocAPI(_ManualWeb3) {
         this.getNextKernel = async function() {
 
             //We must check before that we have a kernel connected.
-            if(Kernel_Info.address === ""){
+            if(typeof Kernel_Info === 'undefined'){
                 throw new KernelQueryError("No kernel connected.");
             }
 
             let nextAddress = await Kernel_Contract.methods.nextKernel().call();
 
-            if (nextAddress === "0x0"){
+            if (nextAddress === "0x0000000000000000000000000000000000000000"){
                 throw new KernelLoadError("No previous kernel to load");
             }
 
@@ -225,14 +233,14 @@ function ULCDocAPI(_ManualWeb3) {
         */
         this.hasNextKernel = async function() {
 
-            if(Kernel_Info.address === ""){
+            if(typeof Kernel_Info === 'undefined'){
                 throw new KernelQueryError("No kernel connected.");
             }
 
             let nextAddress = await Kernel_Contract.methods.nextKernel().call();
 
 
-            return nextAddress != "0x0";
+            return nextAddress != "0x0000000000000000000000000000000000000000";
         }
 
         /**
@@ -241,7 +249,7 @@ function ULCDocAPI(_ManualWeb3) {
         getKernelConfigV5 = async function(){
             //lisibility purposes : creating an array
             let promList = new Array();
-            let infos = new Kernel_ConfigV5();
+            let info = new Kernel_ConfigV5();
 
             //loading Kernel info elements
             promList.push(Kernel_Contract.methods.operatorsForChange().call());
@@ -254,9 +262,9 @@ function ULCDocAPI(_ManualWeb3) {
                 throw new KernelLoadError("Impossible to fetch Kernel basic information V5.");
             });
 
-            infos.operatorsForChange = Number(values[0]);
-            infos.hashMethod = values[1];
-            infos.docFamily= values[2].split(",");
+            info.operatorsForChange = Number(values[0]);
+            info.hashMethod = values[1];
+            info.docFamily= values[2].split(",");
 
             return info;
         }
@@ -298,7 +306,7 @@ function ULCDocAPI(_ManualWeb3) {
             //At this moment, Kernel version is OK. Loading the righ ABI according to Kernel Version.
             if(kernelVersion === 5){
                 Kernel_Contract = new Web3Obj.eth.Contract(ULCDocKernelV5_ABI, raw_address);
-                Kernel_Info = await fillKernelInfoV5();
+                Kernel_Info = await getKernelConfigV5();
             }
             else {
                 throw new Error("Impossible to configure Kernel_Contract.");
@@ -317,13 +325,18 @@ function ULCDocAPI(_ManualWeb3) {
         @return bool
         */
         this.isAtleastOperator = async function(_Address) {
+
+            if(typeof Kernel_Info === 'undefined'){
+                throw new KernelQueryError("No kernel connected.");
+            }
+
             let isOwner = false;
             let isOperator = false;
 
-            isOwner = await Kernel_Contract.methods.owners().call();
+            isOwner = await Kernel_Contract.methods.owners(_Address).call();
 
             if(!isOwner){
-                let isOperator = await Kernel_Contract.methods.operators().call();
+                isOperator = await Kernel_Contract.methods.operators(_Address).call();
             }
 
             return isOwner || isOperator;
@@ -332,7 +345,11 @@ function ULCDocAPI(_ManualWeb3) {
         /**
         @Title object that handle document behaviour.
         */
-        function KernelDocument(_SignatureHash) {
+        this.KernelDocument = function(_SignatureHash) {
+
+            if(typeof Kernel_Info === 'undefined'){
+                throw new KernelQueryError("No kernel connected.");
+            }
 
             function KernelDocumentV5(_Hash){
                 this.hash = _Hash;
@@ -385,7 +402,7 @@ function ULCDocAPI(_ManualWeb3) {
                     document_obj.signed = firstSerie[0];
                     document_obj.document_family = firstSerie[1];
                     document_obj.source = firstSerie[2];
-                    document_obj.extra_data = firstSerie[3];
+                    document_obj.extra_data = formatExtraDataV5(firstSerie[3]);
 
                     //if the document is signed, we can ask for more information.
                     if(document_obj.signed){
@@ -419,7 +436,7 @@ function ULCDocAPI(_ManualWeb3) {
             */
             this.getConfirmList = async function(){
                 let hashSignature = Web3Obj.utils.soliditySha3("as", document_hash);
-                let signaturesArray = await ULCDocKernel.methods.getOperatorRequest(hashSignature).call();
+                let signaturesArray = await Kernel_Contract.methods.getOperatorRequest(hashSignature).call();
                 return signaturesArray;
             }
 
@@ -428,19 +445,14 @@ function ULCDocAPI(_ManualWeb3) {
             @return A document with filled information.
             */
             this.load = async function (){
-                //We must check before that we have a kernel connected.
-                if(Kernel_Info.address === ""){
-                    throw new KernelQueryError("No kernel connected.");
-                }
-
                 //Then we can reach information about the document.
                 let docResult;
 
-                if(Kernel_Info.kernelVersion === 5){
+                if(Kernel_Info.version === 5){
                     docResult = await loadDocumentInfoV5();
                 }
                 else {
-                    throw new Error("Impossible to get the document from Kernel.");
+                    throw new Error("Impossible to get the document from Kernel. Version error");
                 }
                 return document_obj;
             }
@@ -450,19 +462,17 @@ function ULCDocAPI(_ManualWeb3) {
             @param {String} _source the source of the document
             @param {Map} {String}{String} _extras map of the extra data : param-value
             */
-            this.setData = function(_source, _extras){
-                document_obj.source = _source;
+            this.setExtraData = function (_extras) {
+                document_obj.extra_data = _extras;
 
-                if(_extras === ""){
-
-                }
-                else {
-                    document_obj.extra_data = _extras;
-                }
                 //Chaining option avaiable.
                 return this;
             }
 
+            this.setSource = function(_source){
+                document_obj.source = _source;
+                return this;
+            }
             this.setDocumentFamily  = function(_DocID){
                 document_obj.document_family_id = _DocID;
                 return this;
@@ -470,7 +480,13 @@ function ULCDocAPI(_ManualWeb3) {
 
         }
 
-        function documentSignQueue(_callBackTxHash, _callBackReceipt, _callBackError) {
+        this.DocumentSignQueue = function(_fromAddress, _callBackTxHash, _callBackReceipt, _callBackError) {
+
+            //if not injected, we can't use this.
+            if(typeof window.ethereum === 'undefined'){
+                throw new Error("Impossible to instanciate a Sign Queue without injected ethereum.");
+            }
+
 
             let whenError = _callBackError;
             let whenTxHash = _callBackTxHash;
@@ -479,22 +495,39 @@ function ULCDocAPI(_ManualWeb3) {
             let documentList = new Map();
 
             this.addDoc = function(_DocToSign, _identifier) {
-                documentList.set(_identifier, _DocToSign);
+                if(typeof _identifier === 'undefined'){
+                    throw new Error("Identifier of the document not provided");
+                }
+
+                documentList.set(_identifier, _DocToSign.getDocument());
                 return this;
             }
 
+            this.getSize = function() {
+                return documentList.size;
+            }
 
-            //@TODO faire les sous fonctions
+            this.remove = function( _identifier) {
 
+                if(typeof _identifier === 'undefined'){
+                    throw new Error("Identifier of the document not provided");
+                }
+                documentList.remove(_identifier);
+            }
 
-            this.requestSign = function(_Optimized = true) {
+            this.requestSign = async function(_Optimized = true) {
 
-                //empty 2D array (hash, index)
-                let confirmArray = [[],[]];
+                if(typeof Kernel_Info === 'undefined'){
+                    throw new KernelQueryError("No kernel connected.");
+                }
 
-                //empty 2D arrays (hash, info, index)
-                let lightPushArray = [[],[],[]];
-                let pushArray = [[],[],[],[],[]];
+                if(documentList.size === 0) {
+                    throw new Error("No document provided.")
+                }
+
+                let confirmArray = [];
+                let lightPushArray = [];
+                let pushArray = [];
 
                 //We assume here all conditions are filled (if we force here then blockchain security will handle it)
 
@@ -505,51 +538,143 @@ function ULCDocAPI(_ManualWeb3) {
                     let oneDoc = i[1];
                     let oneID = i[0];
 
+                    console.log(oneDoc);
+
                     //need to set type of action.
-                    if(oneDoc.source === "" && oneDoc.extra_data.size === "" && oneDoc.document_family_id === 0){
+                    if(oneDoc.source === "" && oneDoc.extra_data.size === 0 && oneDoc.document_family_id === 0){
                         //no Info, simple confirmation then.
-                        confirmArray[0].push(oneDoc.hash);
-                        confirmArray[1].push(oneID);
+                        confirmArray.push(oneID);
                     }
                     else {
                         if(oneDoc.source === "" && oneDoc.extra_data.size === 0){
                             //no source and extra data mean no string array so we can call light pushDoc.
-                            lightPushArray[0].push(oneDoc.hash);
-                            lightPushArray[1].push(oneDoc.document_family_id);
-                            lightPushArray[2].push(oneID);
+                            lightPushArray.push(oneID);
                         }
                         else {
                             //else it gonna be simple pushing.
-                            pushArray[0].push(oneDoc.hash);
-                            pushArray[1].push(oneDoc.source);
-                            pushArray[2].push(oneDoc.document_family_id);
-                            pushArray[3].push(oneDoc.extra_data);
-                            pushArray[4].push(oneID);
+                            pushArray.push(oneID);
                         }
                     }
                 }
 
                 //now execute it.
                 //for gaz opti, better to call one by one signing if only one item.
-                if(confirmArray[0].length > 0){
-                    (confirmArray[0].length > 1 && _Optimized) ? requestMultiConfirmDocs(confirmArray[0],confirmArray[1]) : requestConfirmDoc(confirmArray[0][0],confirmArray[1][0]);
-                }
 
-                if(lightPushArray[0].length > 0){
-                    (lightPushArray[0].length > 1 && _Optimized) ? requestMultiLightPushDocs(lightPushArray[0],lightPushArray[1],lightPushArray[2]) : requestPushDoc(lightPushArray[0][0], lightPushArray[1][0], lightPushArray[2][0]);
-                }
-
-                if(pushArray[0].length > 0){
-                    for (i in pushArray[0]){
-                        requestPushDoc(pushArray[0][i], pushArray[1][i], pushArray[2][i], pushArray[3][i], pushArray[4][i]);
+                if(_Optimized){
+                    if(confirmArray.length > 0){
+                        (confirmArray.length > 1) ? requestMultiConfirmDocs(confirmArray) : requestConfirmDoc(confirmArray[0]);
                     }
+
+                    if(lightPushArray.length > 0){
+                        (lightPushArray.length > 1) ? requestMultiLightPushDocs(lightPushArray) : requestPushDoc(lightPushArray[0]);
+                    }
+
+                    if(pushArray.length > 0){
+                        for (i in pushArray){
+                            requestPushDoc(pushArray[i]);
+                        }
+                    }
+                }
+                else {
+                    for (i in confirmArray) requestConfirmDoc(theDoc[i]);
+                    for (i in lightPushArray) requestLightPushDoc(theDoc[i]);
+                    for (i in pushArray) requestPushDoc(pushArray[i]);
                 }
             }
 
+            /**
+            @title Function that request to Metamask simple Push document blockchain method.
+            @param _identifier the identifier of the document
+            */
+            function requestPushDoc(_identifier){
+
+                let doc = documentList.get(_identifier);
+                //@TODO check if ok with no arg about the account.
+                Kernel_Contract.methods.pushDocument(doc.hash, doc.source, doc.document_family_id, extraDataFormatV5(doc.extra_data)).send({from: _fromAddress})
+                .on('error',(error) => {
+                    whenError(_identifier, error);
+                })
+                .on('transactionHash', (hash) => {
+                    whenTxHash(_identifier, hash);
+                })
+                .on('receipt', (receipt) => {
+                    whenReceipt(_identifier, receipt);
+                });
+            }
+
+            function requestConfirmDoc(_identifier){
+                Kernel_Contract.methods.requestSignature(documentList.get(_identifier).hash).send({from: _fromAddress})
+                .on('error',(error) => {
+                    whenError(_identifier, error);
+                })
+                .on('transactionHash', (hash) => {
+                    whenTxHash(_identifier, hash);
+                })
+                .on('receipt', (receipt) => {
+                    whenReceipt(_identifier, receipt);
+                });
+            }
+
+            function requestMultiConfirmDocs(_identifierArray){
+
+                let hashArray = new Array();
+
+                for (i of _identifierArray) hashArray.push(documentList.get(i).hash);
+
+                Kernel_Contract.methods.requestSignatureList(hashArray).send({from: _fromAddress})
+                .on('error',(error) => {
+                    for(i of _identifierArray){
+                        whenError(i, error);
+                    }
+                })
+                .on('transactionHash', (hash) => {
+                    for(i of _identifierArray){
+                        whenTxHash(i, hash);
+                    }
+                })
+                .on('receipt', (receipt) => {
+                    for(i of _identifierArray){
+                        whenReceipt(i, receipt);
+                    }
+                });
+            }
+
+            function requestMultiLightPushDocs(_identifierArray){
+
+                let docFamilyArray = new Array();
+                let docHashArray = new Array();
+
+                for (i of _identifierArray) {
+                    let oneDoc = documentList.get(i);
+                    docFamilyArray.push(oneDoc.document_family_id);
+                    docHashArray.push(oneDoc.hash);
+                }
+
+                Kernel_Contract.methods.lightPushDocumentList(docHashArray,docFamilyArray).send({from: _fromAddress})
+                .on('error',(error) => {
+                    for(i of _identifierArray){
+                        whenError(i, error);
+                    }
+                })
+                .on('transactionHash', (hash) => {
+                    for(i of _identifierArray){
+                        whenTxHash(i, hash);
+                    }
+                })
+                .on('receipt', (receipt) => {
+                    for(i of _identifierArray){
+                        whenReceipt(i, receipt);
+                    }
+                });
+            }
 
 
         }
 
+
+    }
+
+    this.ULCDocModerator = function (_ModeratorAddress) {
 
     }
 
