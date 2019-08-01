@@ -236,6 +236,20 @@ var ULCDocKernelV5_ABI = [
     "constant": false,
     "inputs": [
       {
+        "name": "_nextContract",
+        "type": "address"
+      }
+    ],
+    "name": "requestNextContract",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
         "name": "_removableOperator",
         "type": "address"
       }
@@ -292,6 +306,20 @@ var ULCDocKernelV5_ABI = [
       {
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "CONTRACT_VERSION",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint16"
       }
     ],
     "payable": false,
@@ -465,20 +493,6 @@ var ULCDocKernelV5_ABI = [
   {
     "constant": true,
     "inputs": [],
-    "name": "KERNEL_VERSION",
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint16"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
     "name": "getDocFamilySize",
     "outputs": [
       {
@@ -516,20 +530,6 @@ var ULCDocKernelV5_ABI = [
     ],
     "payable": false,
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_nextKernel",
-        "type": "address"
-      }
-    ],
-    "name": "requestNextKernel",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -703,7 +703,7 @@ var ULCDocKernelV5_ABI = [
   {
     "constant": true,
     "inputs": [],
-    "name": "PREVIOUS_KERNEL",
+    "name": "PREVIOUS_CONTRACT",
     "outputs": [
       {
         "name": "",
@@ -834,20 +834,6 @@ var ULCDocKernelV5_ABI = [
   {
     "constant": true,
     "inputs": [],
-    "name": "nextKernel",
-    "outputs": [
-      {
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
     "name": "HASH_ALGORITHM",
     "outputs": [
       {
@@ -923,6 +909,20 @@ var ULCDocKernelV5_ABI = [
       {
         "name": "",
         "type": "uint16"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "nextContract",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
       }
     ],
     "payable": false,

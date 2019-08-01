@@ -17,7 +17,7 @@
   {
     "constant": true,
     "inputs": [],
-    "name": "KERNEL_VERSION",
+    "name": "CONTRACT_VERSION",
     "outputs": [
       {
         "name": "",

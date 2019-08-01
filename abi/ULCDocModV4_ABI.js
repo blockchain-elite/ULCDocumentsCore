@@ -13,7 +13,7 @@
   You should have received a copy of the GNU Lesser General Public License
   along with the   ULCDocApp Connector (ie: all files inside ABI folder)  . If not, see <http://www.gnu.org/licenses/>. */
 
-ULCDocModV3_ABI = [
+ULCDocModV4_ABI = [
   {
     "constant": true,
     "inputs": [
@@ -34,39 +34,46 @@ ULCDocModV3_ABI = [
     "type": "function"
   },
   {
-    "constant": false,
+    "constant": true,
     "inputs": [
       {
-        "name": "_ULCDocKernelAddress",
+        "name": "_kernelAddress",
         "type": "address"
-      },
+      }
+    ],
+    "name": "getKernelInformation",
+    "outputs": [
       {
-        "name": "_name",
+        "name": "",
         "type": "string"
       },
       {
-        "name": "_isOrga",
-        "type": "bool"
-      }
-    ],
-    "name": "push_KernelIdentity",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
+        "name": "",
+        "type": "string"
+      },
       {
-        "name": "_urlSearch",
+        "name": "",
+        "type": "string"
+      },
+      {
+        "name": "",
+        "type": "string"
+      },
+      {
+        "name": "",
+        "type": "string"
+      },
+      {
+        "name": "",
+        "type": "string"
+      },
+      {
+        "name": "",
         "type": "string"
       }
     ],
-    "name": "set_SearchKernel",
-    "outputs": [],
     "payable": false,
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -87,28 +94,42 @@ ULCDocModV3_ABI = [
     "constant": false,
     "inputs": [
       {
-        "name": "_ULCDocKernelAddress",
+        "name": "_kernelAddress",
         "type": "address"
       }
     ],
-    "name": "confirm_KernelIdentity",
+    "name": "confirmRevokeKernelIdentity",
     "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "constant": true,
-    "inputs": [],
-    "name": "MODERATOR_URL",
-    "outputs": [
+    "constant": false,
+    "inputs": [
       {
-        "name": "",
-        "type": "string"
+        "name": "_kernelAddress",
+        "type": "address"
       }
     ],
+    "name": "forceConfirmKernelIdentity",
+    "outputs": [],
     "payable": false,
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_nextContract",
+        "type": "address"
+      }
+    ],
+    "name": "requestNextContract",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -129,14 +150,36 @@ ULCDocModV3_ABI = [
     "constant": false,
     "inputs": [
       {
-        "name": "_urlModerator",
-        "type": "string"
+        "name": "_kernelAddress",
+        "type": "address"
+      },
+      {
+        "name": "_switchOrga",
+        "type": "bool"
+      },
+      {
+        "name": "_lastKernelAddress",
+        "type": "address"
       }
     ],
-    "name": "set_ModeratorURL",
+    "name": "updateKernelIdentity",
     "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "getIncrementer",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -159,14 +202,36 @@ ULCDocModV3_ABI = [
     "type": "function"
   },
   {
+    "constant": true,
+    "inputs": [],
+    "name": "CONTRACT_VERSION",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint16"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "constant": false,
     "inputs": [
       {
-        "name": "_ULCDocKernelAddress",
+        "name": "_NewKernelAddress",
         "type": "address"
+      },
+      {
+        "name": "_linkableKernelIdentityAddress",
+        "type": "address"
+      },
+      {
+        "name": "_updateLastAddressField",
+        "type": "bool"
       }
     ],
-    "name": "confirm_RevokeKernelIdentity",
+    "name": "pushNewAddressToIdentity",
     "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
@@ -194,84 +259,21 @@ ULCDocModV3_ABI = [
     "constant": false,
     "inputs": [
       {
-        "name": "_index",
-        "type": "uint256"
-      },
+        "name": "_urlSearch",
+        "type": "string"
+      }
+    ],
+    "name": "setSearchKernel",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
       {
         "name": "_kernelAddress",
-        "type": "address"
-      }
-    ],
-    "name": "transferedKernelIdentity",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_ULCDocKernelAddress",
-        "type": "address"
-      },
-      {
-        "name": "_url",
-        "type": "string"
-      }
-    ],
-    "name": "set_KernelURL",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [],
-    "name": "kill",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_ULCDocKernelAddress",
-        "type": "address"
-      },
-      {
-        "name": "_extra_data",
-        "type": "string"
-      }
-    ],
-    "name": "set_KernelExtra",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "getKernelBookSize",
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_ULCDocKernelAddress",
         "type": "address"
       },
       {
@@ -279,7 +281,7 @@ ULCDocModV3_ABI = [
         "type": "string"
       }
     ],
-    "name": "push_RevokeKernelIdentity",
+    "name": "pushRevokeKernelIdentity",
     "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
@@ -289,18 +291,102 @@ ULCDocModV3_ABI = [
     "constant": false,
     "inputs": [
       {
-        "name": "_ULCDocKernelAddress",
+        "name": "_kernelAddress",
+        "type": "address"
+      }
+    ],
+    "name": "confirmKernelIdentity",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_kernelAddress",
         "type": "address"
       },
       {
-        "name": "_physicalAddress",
+        "name": "_name",
         "type": "string"
+      },
+      {
+        "name": "_isOrga",
+        "type": "bool"
       }
     ],
-    "name": "set_PhysicalAddress",
+    "name": "pushKernelIdentity",
     "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_urlModerator",
+        "type": "string"
+      }
+    ],
+    "name": "setModeratorURL",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "kernelIdentityBook",
+    "outputs": [
+      {
+        "name": "initialized",
+        "type": "bool"
+      },
+      {
+        "name": "confirmed",
+        "type": "bool"
+      },
+      {
+        "name": "revoked",
+        "type": "bool"
+      },
+      {
+        "name": "organisation",
+        "type": "bool"
+      },
+      {
+        "name": "lastContractAddress",
+        "type": "address"
+      },
+      {
+        "name": "version",
+        "type": "uint256"
+      },
+      {
+        "name": "revokedDate",
+        "type": "uint256"
+      },
+      {
+        "name": "revokedReason",
+        "type": "string"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -318,80 +404,34 @@ ULCDocModV3_ABI = [
     "type": "function"
   },
   {
-    "constant": true,
-    "inputs": [],
-    "name": "REGISTER_URL",
-    "outputs": [
-      {
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [],
-    "name": "clearKill",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [
-      {
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "KERNEL_INFO_BOOK",
-    "outputs": [
-      {
-        "name": "url",
-        "type": "string"
-      },
-      {
-        "name": "mail",
-        "type": "string"
-      },
-      {
-        "name": "physicalAddress",
-        "type": "string"
-      },
-      {
-        "name": "imageURL",
-        "type": "string"
-      },
-      {
-        "name": "phone",
-        "type": "string"
-      },
-      {
-        "name": "extra_data",
-        "type": "string"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "constant": false,
     "inputs": [
       {
-        "name": "_ULCDocKernelAddress",
+        "name": "_kernelAddress",
         "type": "address"
+      },
+      {
+        "name": "_name",
+        "type": "string"
+      },
+      {
+        "name": "_url",
+        "type": "string"
+      },
+      {
+        "name": "_mail",
+        "type": "string"
+      },
+      {
+        "name": "_physicalAddress",
+        "type": "string"
       },
       {
         "name": "_phone",
         "type": "string"
       }
     ],
-    "name": "set_KernelPhone",
+    "name": "updateKernelInformation",
     "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
@@ -401,15 +441,11 @@ ULCDocModV3_ABI = [
     "constant": false,
     "inputs": [
       {
-        "name": "_index",
-        "type": "uint256"
-      },
-      {
-        "name": "_kernelAddress",
-        "type": "address"
+        "name": "_urlRegister",
+        "type": "string"
       }
     ],
-    "name": "request_removeKernelIdentiy",
+    "name": "setModeratorRegistrer",
     "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
@@ -430,27 +466,83 @@ ULCDocModV3_ABI = [
     "type": "function"
   },
   {
-    "constant": false,
+    "constant": true,
     "inputs": [
       {
-        "name": "_urlRegister",
+        "name": "_kernelAddress",
+        "type": "address"
+      }
+    ],
+    "name": "getKernelIdentity",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      },
+      {
+        "name": "",
+        "type": "bool"
+      },
+      {
+        "name": "",
+        "type": "bool"
+      },
+      {
+        "name": "",
+        "type": "bool"
+      },
+      {
+        "name": "",
+        "type": "address"
+      },
+      {
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "name": "",
         "type": "string"
       }
     ],
-    "name": "set_ModeratorRegistrer",
-    "outputs": [],
     "payable": false,
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "kernelIdentifierIterable",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
     "type": "function"
   },
   {
     "constant": true,
     "inputs": [],
-    "name": "Contract_Version",
+    "name": "PREVIOUS_CONTRACT",
     "outputs": [
       {
         "name": "",
-        "type": "uint8"
+        "type": "address"
       }
     ],
     "payable": false,
@@ -461,128 +553,11 @@ ULCDocModV3_ABI = [
     "constant": false,
     "inputs": [
       {
-        "name": "_ULCDocKernelAddress",
-        "type": "address"
-      },
-      {
-        "name": "_mail",
-        "type": "string"
-      }
-    ],
-    "name": "set_KernelMail",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_ULCDocKernelAddress",
-        "type": "address"
-      },
-      {
-        "name": "_isOrga",
-        "type": "bool"
-      }
-    ],
-    "name": "set_Organisation",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_ULCDocKernelAddress",
-        "type": "address"
-      },
-      {
-        "name": "_physicalAddress",
-        "type": "string"
-      },
-      {
-        "name": "_url",
-        "type": "string"
-      },
-      {
-        "name": "_mail",
-        "type": "string"
-      },
-      {
-        "name": "_imageURL",
-        "type": "string"
-      },
-      {
-        "name": "_phone",
-        "type": "string"
-      }
-    ],
-    "name": "update_KernelInformation",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [
-      {
-        "name": "",
+        "name": "_kernelAddress",
         "type": "address"
       }
     ],
-    "name": "KERNEL_IDENTITY_BOOK",
-    "outputs": [
-      {
-        "name": "initialized",
-        "type": "bool"
-      },
-      {
-        "name": "confirmed",
-        "type": "bool"
-      },
-      {
-        "name": "isRevoked",
-        "type": "bool"
-      },
-      {
-        "name": "isOrganisation",
-        "type": "bool"
-      },
-      {
-        "name": "version",
-        "type": "uint256"
-      },
-      {
-        "name": "revoked_date",
-        "type": "uint256"
-      },
-      {
-        "name": "name",
-        "type": "string"
-      },
-      {
-        "name": "revoked_reason",
-        "type": "string"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_ULCDocKernelAddress",
-        "type": "address"
-      }
-    ],
-    "name": "clear_RevokeProcess",
+    "name": "clearRevokeProcess",
     "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
@@ -606,36 +581,36 @@ ULCDocModV3_ABI = [
     "constant": false,
     "inputs": [
       {
-        "name": "_ULCDocKernelAddress",
+        "name": "_kernelAddress",
         "type": "address"
       },
       {
-        "name": "_name",
+        "name": "_imageURL",
+        "type": "string"
+      },
+      {
+        "name": "_extraData",
         "type": "string"
       }
     ],
-    "name": "set_KernelName",
+    "name": "updateKernelExtras",
     "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "constant": false,
-    "inputs": [
+    "constant": true,
+    "inputs": [],
+    "name": "nextContract",
+    "outputs": [
       {
-        "name": "_ULCDocKernelAddress",
+        "name": "",
         "type": "address"
-      },
-      {
-        "name": "_imageURL",
-        "type": "string"
       }
     ],
-    "name": "set_KernelImage",
-    "outputs": [],
     "payable": false,
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -661,11 +636,11 @@ ULCDocModV3_ABI = [
     "constant": false,
     "inputs": [
       {
-        "name": "_newContractAddress",
-        "type": "address"
+        "name": "_nb",
+        "type": "uint256"
       }
     ],
-    "name": "requestUpgradeSmartContract",
+    "name": "setOwnersForChange",
     "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
@@ -675,11 +650,11 @@ ULCDocModV3_ABI = [
     "constant": false,
     "inputs": [
       {
-        "name": "_nb",
-        "type": "uint256"
+        "name": "_kernelAddress",
+        "type": "address"
       }
     ],
-    "name": "setOwnersForChange",
+    "name": "requestRemoveKernelIdentiy",
     "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
@@ -709,25 +684,6 @@ ULCDocModV3_ABI = [
     "type": "function"
   },
   {
-    "constant": true,
-    "inputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "KERNEL_BOOK_KEYS",
-    "outputs": [
-      {
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "constant": false,
     "inputs": [
       {
@@ -735,7 +691,7 @@ ULCDocModV3_ABI = [
         "type": "address"
       }
     ],
-    "name": "clear_KernelIdentityRemoval",
+    "name": "requestRemoveKernelAddress",
     "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
@@ -743,35 +699,46 @@ ULCDocModV3_ABI = [
   },
   {
     "constant": true,
-    "inputs": [],
-    "name": "SEARCH_KERNEL_URL",
-    "outputs": [
+    "inputs": [
       {
         "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "kernelInfoBook",
+    "outputs": [
+      {
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "name": "mail",
+        "type": "string"
+      },
+      {
+        "name": "physicalAddress",
+        "type": "string"
+      },
+      {
+        "name": "imageURL",
+        "type": "string"
+      },
+      {
+        "name": "phone",
+        "type": "string"
+      },
+      {
+        "name": "extraData",
         "type": "string"
       }
     ],
     "payable": false,
     "stateMutability": "view",
     "type": "function"
-  },
-  {
-    "inputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "name": "kernelAddress",
-        "type": "address"
-      }
-    ],
-    "name": "newKernelRegistred",
-    "type": "event"
   },
   {
     "anonymous": false,
