@@ -133,6 +133,20 @@ ULCDocModV4_ABI = [
     "type": "function"
   },
   {
+    "constant": true,
+    "inputs": [],
+    "name": "MODERATOR_URL",
+    "outputs": [
+      {
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "constant": false,
     "inputs": [
       {
@@ -225,10 +239,6 @@ ULCDocModV4_ABI = [
       {
         "name": "_linkableKernelIdentityAddress",
         "type": "address"
-      },
-      {
-        "name": "_updateLastAddressField",
-        "type": "bool"
       }
     ],
     "name": "pushNewAddressToIdentity",
@@ -401,6 +411,20 @@ ULCDocModV4_ABI = [
     "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "REGISTER_URL",
+    "outputs": [
+      {
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -733,6 +757,20 @@ ULCDocModV4_ABI = [
       },
       {
         "name": "extraData",
+        "type": "string"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "SEARCH_KERNEL_URL",
+    "outputs": [
+      {
+        "name": "",
         "type": "string"
       }
     ],

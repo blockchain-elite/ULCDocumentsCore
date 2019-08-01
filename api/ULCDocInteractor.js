@@ -34,6 +34,11 @@ function ULCDocAPI(_DefaultWeb3provider) {
     @return {Map} the map with extra_datas properties loaded
     */
     let formatExtraDataV5 = function (raw_extra_data){
+
+        if(raw_extra_data === ""){
+            return new Map();
+        }
+
         let extra_data_table = raw_extra_data.split(',');
         let result = new Map();
         extra_data_table.forEach(function(oneExtraDataCouple){
@@ -95,7 +100,7 @@ function ULCDocAPI(_DefaultWeb3provider) {
 
     /**
     @dev This Object can interact through ULCDocKernel, without Web3 knowledge.
-    @dependancies Web3, ULCDocVersionner_ABI,ULCDocKernelV5_ABI, ULCDocModV3_ABI
+    @dependancies Web3, ULCDocVersionner_ABI,ULCDocKernelV5_ABI
     @constructor {string} _KernelAddress the address of the kernel.
     */
     this.ULCDocKernel  = function (_KernelAddress) {
@@ -114,7 +119,7 @@ function ULCDocAPI(_DefaultWeb3provider) {
          * @dev we must connect to the kernel to get configuration of the latter.
          * @returns {boolean}
          */
-        this.kernelConnected = function() {
+        this.connected = function() {
             return typeof Kernel_Info !== 'undefined';
         };
 
@@ -149,22 +154,22 @@ function ULCDocAPI(_DefaultWeb3provider) {
          * @title return a  ULCDocKernel object which is the previous kernel.
          * @throws Error if kernel not connected yet;
          * @throws Error if no previous kernel to load.
-         * @returns {Promise<ULCDocKernel>}
+         * @returns ULCDocKernel
          */
         this.getPreviousKernel = async function() {
 
             //We must check before that we have a kernel connected.
-            if(!this.kernelConnected()){
+            if(!this.connected()){
                 throw new Error("Kernel is not connected. Please use connect() function.");
             }
 
-            let previousAddress = await Kernel_Contract.methods.PREVIOUS_KERNEL().call();
+            let previousAddress = await Kernel_Contract.methods.PREVIOUS_CONTRACT().call();
 
             if (previousAddress === ULCDocAPI.ZERO_ADDRESS){
                 throw new Error("No previous kernel to load");
             }
 
-            return new ULCDocKernel(previousAddress);
+            return this.getKernel(previousAddress);
         };
 
         /**
@@ -173,11 +178,11 @@ function ULCDocAPI(_DefaultWeb3provider) {
         */
         this.hasPreviousKernel = async function() {
 
-            if(!this.kernelConnected()){
+            if(!this.connected()){
                 throw new Error("Kernel is not connected. Please use connect() function.");
             }
 
-            let previousAddress = await Kernel_Contract.methods.PREVIOUS_KERNEL().call();
+            let previousAddress = await Kernel_Contract.methods.PREVIOUS_CONTRACT().call();
 
 
             return previousAddress !== ULCDocAPI.ZERO_ADDRESS;
@@ -186,22 +191,22 @@ function ULCDocAPI(_DefaultWeb3provider) {
         /** @title Function that return the next ULCDocKernel object.
          * @throws Error if kernel not connected yet;
          * @throws if no previous kernel to load.
-         * @returns {Promise<ULCDocKernel>}
+         * @returns ULCDocKernel
         */
         this.getNextKernel = async function() {
 
             //We must check before that we have a kernel connected.
-            if(!this.kernelConnected()){
+            if(!this.connected()){
                 throw new Error("Kernel is not connected. Please use connect() function.");
             }
 
-            let nextAddress = await Kernel_Contract.methods.nextKernel().call();
+            let nextAddress = await Kernel_Contract.methods.nextContract().call();
 
             if (nextAddress === ULCDocAPI.ZERO_ADDRESS){
                 throw new Error("No previous kernel to load");
             }
 
-            return new ULCDocKernel(nextAddress);
+            return this.getKernel(nextAddress);
         };
 
         /**
@@ -210,11 +215,11 @@ function ULCDocAPI(_DefaultWeb3provider) {
         */
         this.hasNextKernel = async function() {
 
-            if(!this.kernelConnected()){
+            if(!this.connected()){
                 throw new Error("No kernel connected.");
             }
 
-            let nextAddress = await Kernel_Contract.methods.nextKernel().call();
+            let nextAddress = await Kernel_Contract.methods.nextContract().call();
 
 
             return nextAddress !== ULCDocAPI.ZERO_ADDRESS;
@@ -236,7 +241,7 @@ function ULCDocAPI(_DefaultWeb3provider) {
             //Executing Promise.All
             let values = await Promise.all(promList).catch(function(err){
                 console.log(err);
-                throw new KernelLoadError("Impossible to fetch Kernel basic information V5.");
+                throw new Error("Impossible to fetch Kernel basic information V5.");
             });
 
             info.operatorsForChange = Number(values[0]);
@@ -250,7 +255,7 @@ function ULCDocAPI(_DefaultWeb3provider) {
         @title connect : connect the API to a Kernel to check documents.
         Can throw different errors :
         @Throw KernelVersionError if the version of the kernel is not compatible with the API.
-        @Throw KernelLoadError if we can't reach minimal functionnalities.
+        @Throw Error if we can't reach minimal functionnalities.
         @return Kernel_Config object
         */
         this.connect = async function () {
@@ -261,7 +266,7 @@ function ULCDocAPI(_DefaultWeb3provider) {
 
             try {
                 //Then we see if it is compatible.
-                kernelVersion = await Kernel_Versionner.methods.KERNEL_VERSION().call();
+                kernelVersion = await Kernel_Versionner.methods.CONTRACT_VERSION().call();
             } catch(err) {
                 throw new Error("Impossible to reach Kernel_Version method.");
             }
@@ -304,7 +309,7 @@ function ULCDocAPI(_DefaultWeb3provider) {
         */
         this.canSign = async function(_Address) {
 
-            if(!this.kernelConnected()){
+            if(!this.connected()){
                 throw new Error("Kernel is not connected. Please use connect() function.");
             }
 
@@ -673,7 +678,220 @@ function ULCDocAPI(_DefaultWeb3provider) {
 
     };
 
+    /**
+     @dev This Object can interact through ULCDocKernel, without Web3 knowledge.
+     @dependancies Web3, ULCDocVersionner_ABI,ULCDocModV4_ABI
+     @constructor {string} _ModeratorAddress the address of the kernel.
+     */
     this.ULCDocModerator = function (_ModeratorAddress) {
+
+        /* ---- CONTRUCTOR --- */
+        if(!Web3Obj.utils.isAddress(_ModeratorAddress)) {
+            throw new Error("Invalid kernel address provided, or checksum capitalisation failed.");
+        }
+        /* ------------------ */
+
+        /**
+         * @title Function that check if we used connect() function.
+         * @dev we must connect to the moderator to get configuration of the latter.
+         * @returns {boolean}
+         */
+        this.connected = function() {
+            return typeof Moderator_Info !== 'undefined';
+        };
+
+        let Moderator_ConfigV4 = function(){
+            this.version = 0;
+            this.moderatorURL = "";
+            this.registerURL = "";
+            this.searchURL = "";
+            this.address = "";
+        };
+
+        let Kernel_Identity = function(){
+            this.initialized = false;
+            this.confirmed = false;
+            this.revoked = false;
+            this.organization = false;
+            this.lastContractAddress = "";
+            this.revokedDate = 0;
+            this.revokedReason = "";
+            this.name = "";
+            this.url = "";
+            this.mail = "";
+            this.physicalAddress = "";
+            this.imageURL = "";
+            this.phone = "";
+            this.extraData = new Map();
+            this.version = 0;
+        };
+
+        let raw_address = _ModeratorAddress;
+
+        //Web3 Contract object
+        let Moderator_Contract;
+
+        //KernelInfo of the Kernel Contract
+        let Moderator_Info;
+
+        this.getModeratorInfo = function() {
+            return Moderator_Info;
+        };
+
+        this.getRawAddress = function() {
+            return raw_address;
+        };
+
+
+        /**
+         * @title Function that fill Moderator info object for V4 and other compatible moderator Info object.
+         */
+        let getModeratorConfigV5 = async function(){
+            //lisibility purposes : creating an array
+            let promList = [];
+            let info = new Moderator_ConfigV4();
+
+            //loading Moderator info elements
+            promList.push(Moderator_Contract.methods.MODERATOR_URL().call());
+            promList.push(Moderator_Contract.methods.REGISTER_URL().call());
+            promList.push(Moderator_Contract.methods.SEARCH_KERNEL_URL().call());
+
+            //Executing Promise.All
+            let values = await Promise.all(promList).catch(function(err){
+                console.log(err);
+                throw new Error("Impossible to fetch Kernel basic information V5.");
+            });
+
+            info.moderatorURL = values[0];
+            info.registerURL = values[1];
+            info.searchURL = values[2];
+            return info;
+        };
+
+
+        let getModeratorQueryV4 = async function(_kernelAddress) {
+            let identity = new Kernel_Identity();
+            //lisibility purposes : creating an array
+            let queryIdentity = await Moderator_Contract.methods.getKernelIdentity(_kernelAddress).call();
+
+            /*
+            [0] bool initialized;
+            [1] bool confirmed;
+            [2] bool revoked;
+            [3] bool organisation;
+            [4] address lastContractAddress;
+            [5] uint256 version
+            [6] uint256 revokedDate;
+            [7] string revokedReason;
+             */
+
+            //if [0] = initialized
+            if(queryIdentity[0]){
+                identity.initialized = true;
+                identity.confirmed = queryIdentity[1];
+                identity.revoked = queryIdentity[2];
+                identity.organization = queryIdentity[3];
+
+                if(queryIdentity[4] === ULCDocAPI.ZERO_ADDRESS){
+                    identity.lastContractAddress = _kernelAddress;
+                }
+
+                identity.version = Number(queryIdentity[5]);
+                identity.revokedDate = Number(queryIdentity[6]);
+                identity.revokedReason = queryIdentity[7];
+
+                /*
+                 [0] string name;
+                 [1] string url;
+                 [2] string mail;
+                 [3] string physicalAddress;
+                 [4] string imageURL;
+                 [5] string phone;
+                 [6] string extraData;
+                 */
+
+                let queryInfo = await Moderator_Contract.methods.getKernelInformation(_kernelAddress).call();
+
+                identity.name = queryInfo[0];
+                identity.url = queryInfo[1];
+                identity.mail = queryInfo[2];
+                identity.physicalAddress = queryInfo[3];
+                identity.imageURL = queryInfo[4];
+                identity.phone = queryInfo[5];
+                identity.extraData = formatExtraDataV5(queryInfo[6]);
+
+
+            }
+
+            return identity;
+
+        };
+        /**
+         @title connect : connect the API to a Kernel to check documents.
+         Can throw different errors :
+         @Throw Error if the version of the kernel is not compatible with the API.
+         @Throw Error if we can't reach minimal functionnalities.
+         @return Moderator_Config object
+         */
+        this.connect = async function () {
+            //First we only load the versionner to know kernel version.
+            let Moderator_Versionner = new Web3Obj.eth.Contract(ULCDocVersionner_ABI, raw_address);
+
+            let moderatorVersion = 0;
+
+            try {
+                //Then we see if it is compatible.
+                moderatorVersion = await Moderator_Versionner.methods.CONTRACT_VERSION().call();
+            } catch(err) {
+                throw new Error("Impossible to reach Kernel_Version method.");
+            }
+
+            let versionCompatible = false;
+            moderatorVersion = Number(moderatorVersion);
+
+            //we check if the Kernel version  is compatible with our list
+            for (ver of ULCDocAPI.COMPATIBLE_MOD_VERSION){
+                if (moderatorVersion === ver) {
+                    versionCompatible = true;
+                    break;
+                }
+            }
+
+            if(!versionCompatible) {
+                throw new Error("Version not compatible. Contract version is '" + moderatorVersion + "''");
+            }
+
+            //At this moment, Moderator version is OK. Loading the righ ABI according to Moderator Version.
+            if(moderatorVersion === 4){
+                Moderator_Contract = new Web3Obj.eth.Contract(ULCDocModV4_ABI, raw_address);
+                Moderator_Info = await getModeratorConfigV5();
+            }
+            else {
+                throw new Error("Impossible to configure Moderator_Contract.");
+            }
+
+            Moderator_Info.version = moderatorVersion;
+            Moderator_Info.address = raw_address;
+
+            return Moderator_Info;
+
+        };
+
+        /**
+         * @title query : ask for mode information about a kernel.
+         *
+         */
+        this.query = async function (_kernelAddress){
+
+            if(!this.connected()){
+                throw new Error("No moderator connected.");
+            }
+
+            if(Moderator_Info.version === 4){
+                return await getModeratorQueryV4(_kernelAddress);
+            }
+
+        }
 
     };
 
@@ -698,11 +916,11 @@ function ULCDocAPI(_DefaultWeb3provider) {
 
 // Version :   [MAIN].[BETA].[BUILD]
 ULCDocAPI.getVersion = function() {
-    return "0.0.2";
+    return "0.0.3";
 };
 
 //Array of all compatible contract version of this Interactor.
-ULCDocAPI.COMPATIBLE_MOD_VERSION = [3];
+ULCDocAPI.COMPATIBLE_MOD_VERSION = [4];
 ULCDocAPI.COMPATIBLE_KERNEL_VERSION  = [5];
 
 /**
@@ -721,7 +939,7 @@ ULCDocAPI.DependancyError = function(message){
  */
 ULCDocAPI.DEFAULT_ADDRESS = new function () {
     this.BCE_MOD_MAINNET = "";
-    this.BCE_MOD_ROPSTEN = "";
+    this.BCE_MOD_ROPSTEN = "0x5ea18f6d4cd7c3189bf179a501937b110f0f731d";
 };
 
 /**
