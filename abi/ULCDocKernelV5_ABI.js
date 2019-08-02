@@ -508,7 +508,7 @@ var ULCDocKernelV5_ABI = [
     "constant": false,
     "inputs": [
       {
-        "name": "_AllSignatureHash",
+        "name": "_signatureHashes",
         "type": "bytes32[]"
       }
     ],
@@ -569,7 +569,7 @@ var ULCDocKernelV5_ABI = [
     "constant": false,
     "inputs": [
       {
-        "name": "_AllSignatureHash",
+        "name": "_signatureHashes",
         "type": "bytes32[]"
       },
       {

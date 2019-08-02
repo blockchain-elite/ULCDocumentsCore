@@ -306,12 +306,7 @@ ULCDocModV4_ABI = [
       }
     ],
     "name": "confirmKernelIdentity",
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
