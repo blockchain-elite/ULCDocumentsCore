@@ -1,10 +1,10 @@
 /*
-This file is part of ULCDocuments Web App.
-ULCDocuments Web App is free software: you can redistribute it and/or modify
+This file is part of ULCDocuments JS API.
+ULCDocuments JS API is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
-ULCDocuments Javascript API is distributed in the hope that it will be useful,
+UULCDocuments JS API is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
@@ -12,14 +12,23 @@ You should have received a copy of the GNU General Public License
 along with ULCDocuments Web App.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/** @title  ULCDOCUMENTS JAVASCRIPT API INTERACTOR
+/** @description  ULCDOCUMENTS JAVASCRIPT API INTERACTOR
 *  @author Adrien BARBANSON <Contact Form On Blockchain-Élite website>
 *  Dev Entity: Blockchain-Elite (https://www.blockchain-elite.fr/)
 */
 
+/**@description Create a new instance of the API with web3
+ * @param _DefaultWeb3provider web3 url provider that will be used if there is not injected web3 by browser.
+ * @requires Web3
+ */
 function ULCDocAPI(_DefaultWeb3provider) {
 
-    this.getWalletAddress = async function() {
+    /**
+     * @description get all addresses available on the browser
+     * @throws Error if there is not wallet injected
+     * @return {Promise<Array>}
+     */
+    this.getWalletAddresses = async function() {
 
         if(!ULCDocAPI.usingInjector()){
             throw new Error("Impossible to get Wallet : no injected ethereum object");
@@ -29,7 +38,7 @@ function ULCDocAPI(_DefaultWeb3provider) {
         return await Web3Obj.eth.getAccounts();
     };
 
-    /** @dev function that deserialise extra_dataV5 field input
+    /** @description function that deserialize extra_dataV5 field input
     @param {String} raw_extra_data the raw extra data
     @return {Map} the map with extra_datas properties loaded
     */
@@ -48,8 +57,8 @@ function ULCDocAPI(_DefaultWeb3provider) {
         return result;
     };
 
-    /** @dev function that serialise extra_data field input
-    *  @param {Map} mapExtraData with unserialised data
+    /** @description function that serialise extra_data field input
+    *  @param {Map} mapExtraData with unserialized data
     * @return {String} serialized data */
     let extraDataFormatV5 = function (mapExtraData){
         //WE ASSUME ':,' char are not used.
@@ -72,7 +81,14 @@ function ULCDocAPI(_DefaultWeb3provider) {
     //the network stored in cache.
     let whichNetwork = "";
 
-    this.getNetwork = function() {
+    /**
+     * @description return network connected on the interactor.
+     * @return {Promise<string>}
+     */
+    this.getNetwork = async function() {
+        if(whichNetwork === "") {
+            whichNetwork = await Web3Obj.eth.net.getNetworkType();
+        }
         return whichNetwork;
     };
 
@@ -89,18 +105,16 @@ function ULCDocAPI(_DefaultWeb3provider) {
     }
 
     else {
-        if (typeof _DefaultWeb3 === 'undefined'){
+        if (typeof _DefaultWeb3provider === 'undefined'){
             throw new Error("web3 is not injected and not provided in the constructor.");
         }
         Web3Obj = new Web3(_DefaultWeb3provider);
-        //We load the network async.
-        Web3Obj.eth.net.getNetworkType().then((result) => whichNetwork = result);
-    }
+        }
     /*********************************/
 
     /**
-    @dev This Object can interact through ULCDocKernel, without Web3 knowledge.
-    @dependancies Web3, ULCDocVersionner_ABI,ULCDocKernelV5_ABI
+    @description This Object can interact through ULCDocKernel, without Web3 knowledge.
+    @requires ULCDocVersionner_ABI,ULCDocKernelV5_ABI
     @constructor {string} _KernelAddress the address of the kernel.
     */
     this.ULCDocKernel  = function (_KernelAddress) {
@@ -115,15 +129,24 @@ function ULCDocAPI(_DefaultWeb3provider) {
 
 
         /**
-         * @title Function that check if we used connect() function.
-         * @dev we must connect to the kernel to get configuration of the latter.
+         * @description Function that check if we used connect() function.
+         * we must connect to the kernel to get configuration of the latter.
          * @returns {boolean}
          */
         this.connected = function() {
             return typeof Kernel_Info !== 'undefined';
         };
 
-        let Kernel_ConfigV5 = function(){
+
+        /**@typedef KernelConfig
+         * @type {Object}
+         * @property {number} version The contract version
+         * @property {number} operatorsForChange number of sign needed
+         * @property {String} hashMethod  how you need to hash document to check signature
+         * @property {Array<String>} docFamily all document family available on the kernel. ID = array index
+         * @property {String} address
+         */
+        let Kernel_Config = function(){
             this.version = 0;
             this.operatorsForChange = -1;
             this.hashMethod = "";
@@ -143,15 +166,15 @@ function ULCDocAPI(_DefaultWeb3provider) {
             return Kernel_Info;
         };
 
-        /** @title Function to get the address of the object without loading KernelConfig.
-        @return {string} the address.
+        /** @description Function to get the address of the object without loading KernelConfig.
+            @return {string} the address.
         */
         this.getRawAddress = function() {
             return raw_address;
         };
 
         /**
-         * @title return a  ULCDocKernel object which is the previous kernel.
+         * @description return a  ULCDocKernel object which is the previous kernel.
          * @throws Error if kernel not connected yet;
          * @throws Error if no previous kernel to load.
          * @returns ULCDocKernel
@@ -173,7 +196,7 @@ function ULCDocAPI(_DefaultWeb3provider) {
         };
 
         /**
-        @title Function that check if current kernel has declared previous one.
+        @description Function that check if current kernel has declared previous one.
         @return {boolean}
         */
         this.hasPreviousKernel = async function() {
@@ -188,7 +211,7 @@ function ULCDocAPI(_DefaultWeb3provider) {
             return previousAddress !== ULCDocAPI.ZERO_ADDRESS;
         };
 
-        /** @title Function that return the next ULCDocKernel object.
+        /** @description Function that return the next ULCDocKernel object.
          * @throws Error if kernel not connected yet;
          * @throws if no previous kernel to load.
          * @returns ULCDocKernel
@@ -210,7 +233,7 @@ function ULCDocAPI(_DefaultWeb3provider) {
         };
 
         /**
-        @title Function that check if current kernel has declared previous one.
+        @description Function that check if current kernel has declared previous one.
         @return {boolean}
         */
         this.hasNextKernel = async function() {
@@ -226,12 +249,12 @@ function ULCDocAPI(_DefaultWeb3provider) {
         };
 
         /**
-         * @title Function that fill Kernel info object for V5 and other compatible kernel Info object.
+         * @description Function that fill Kernel info object for V5 and other compatible kernel Info object.
         */
         let getKernelConfigV5 = async function(){
             //lisibility purposes : creating an array
             let promList = [];
-            let info = new Kernel_ConfigV5();
+            let info = new Kernel_Config();
 
             //loading Kernel info elements
             promList.push(Kernel_Contract.methods.operatorsForChange().call());
@@ -252,11 +275,11 @@ function ULCDocAPI(_DefaultWeb3provider) {
         };
 
         /**
-        @title connect : connect the API to a Kernel to check documents.
+        @description connect : connect the API to a Kernel to check documents.
         Can throw different errors :
         @Throw KernelVersionError if the version of the kernel is not compatible with the API.
         @Throw Error if we can't reach minimal functionnalities.
-        @return Kernel_Config object
+        @return {KernelConfig}
         */
         this.connect = async function () {
             //First we only load the versionner to know kernel version.
@@ -304,7 +327,7 @@ function ULCDocAPI(_DefaultWeb3provider) {
 
 
         /**
-        @title Function that check if the current address can sign a document in the kernel
+        @description Function that check if the current address can sign a document in the kernel
         @return {boolean}
         */
         this.canSign = async function(_Address) {
@@ -326,7 +349,7 @@ function ULCDocAPI(_DefaultWeb3provider) {
         };
 
         /**
-        @title object that handle document behaviour.
+        @description object that handle document behaviour.
         */
         this.KernelDocument = function(_SignatureHash) {
 
@@ -337,7 +360,23 @@ function ULCDocAPI(_DefaultWeb3provider) {
                 throw new Error("Hash of the document don't start by prefix 0x.");
             }
 
-            let KernelDocumentV5 = function(_Hash){
+            /**
+             * @typedef DocumentData
+             * @type {Object}
+             * @property {String} hash The hash of the document
+             * @property {number} signed_date when the document is confirmed
+             * @property {number} revoked_date  when the document is revoked
+             * @property {String} document_family the document family (read only)
+             * @property {number} document_family_id id of kernel doc family (to confirm/push a document)
+             * @property {boolean} initialized
+             * @property {boolean} signed
+             * @property {boolean} revoked
+             * @property {String} source
+             * @property {Map<String,String>} extra_data
+             * @property {String} revoked_reason
+             * @property {number} version the kernel version who host document signature.
+             * */
+            let Document_Data = function(_Hash){
                 this.hash = _Hash;
                 this.signed_date = 0;
                 this.revoked_date = 0;
@@ -357,7 +396,7 @@ function ULCDocAPI(_DefaultWeb3provider) {
 
             // CONSTRUCTOR
             if(Kernel_Info.version === 5){
-                document_obj = new KernelDocumentV5(_SignatureHash);
+                document_obj = new Document_Data(_SignatureHash);
             }
             else {
                 throw new Error("Impossible to set correct document version. Kernel incompatible ?");
@@ -369,9 +408,9 @@ function ULCDocAPI(_DefaultWeb3provider) {
 
 
             /**
-            @title Function that return a DocumentV5 complete infos. Requests are optimized.
+            @description Function that return a DocumentV5 complete infos. Requests are optimized.
             */
-            async function loadDocumentInfoV5(){
+            async function loadDocumentDataV5(){
 
                 document_obj.initialized = await Kernel_Contract.methods.isInitialized(_SignatureHash).call();
                 document_obj.hash = _SignatureHash;
@@ -416,7 +455,7 @@ function ULCDocAPI(_DefaultWeb3provider) {
             }
 
             /**
-            @title Function that return information about who confirmed the current document.
+            @description Function that return information about who confirmed the current document.
             */
             this.getConfirmList = async function(){
                 let hashSignature = Web3Obj.utils.soliditySha3("as", document_obj.hash);
@@ -424,8 +463,8 @@ function ULCDocAPI(_DefaultWeb3provider) {
             };
 
             /**
-            @title Function that load all document blockchain information.
-            @return A document with filled information.
+            @description Function that load all document blockchain information.
+            @return {DocumentData}
             */
             this.load = async function (){
                 //Then we can reach information about the document.
@@ -433,7 +472,7 @@ function ULCDocAPI(_DefaultWeb3provider) {
 
                 if(Kernel_Info.version === 5){
                     try{
-                        docResult = await loadDocumentInfoV5();
+                        docResult = await loadDocumentDataV5();
                     }catch(err){
                         throw new Error("Error when query document to kernel.");
                     }
@@ -446,7 +485,7 @@ function ULCDocAPI(_DefaultWeb3provider) {
             };
 
             /**
-            @title Function that fill some document optional data.
+            @description Function that fill some document optional data.
             @param _extras {Map} {String}{String}  map of the extra data : param,value
             */
             this.setExtraData = function (_extras) {
@@ -466,8 +505,8 @@ function ULCDocAPI(_DefaultWeb3provider) {
                 return this;
             };
 
-            this.setDocumentFamily  = function(_DocID){
-                document_obj.document_family_id = _DocID;
+            this.setDocumentFamily  = function(_docID){
+                document_obj.document_family_id = _docID;
                 return this;
             };
 
@@ -491,6 +530,12 @@ function ULCDocAPI(_DefaultWeb3provider) {
 
             let documentList = new Map();
 
+            /**
+             * @description add a document to the list of document to sign in a row
+             * @param _DocToSign {DocumentData} the document
+             * @param _identifier {Object} any type of identifier
+             * @return {ULCDocAPI} to add possibility of chaining.
+             */
             this.addDoc = function(_DocToSign, _identifier) {
 
                 if(typeof _identifier === 'undefined'){
@@ -502,10 +547,18 @@ function ULCDocAPI(_DefaultWeb3provider) {
                 return this;
             };
 
+            /**
+             * @description return the size of the list of document to sign
+             * @return {number}
+             */
             this.getSize = function() {
                 return documentList.size;
             };
 
+            /**
+             * @description remove a document from the list
+             * @param _identifier {Object} the identifier used when you added the document to the list.
+             */
             this.removeDoc = function( _identifier) {
 
                 if(typeof _identifier === 'undefined'){
@@ -515,10 +568,18 @@ function ULCDocAPI(_DefaultWeb3provider) {
                 documentList.delete(_identifier);
             };
 
+            /**
+             * @description reset all the document list
+             */
             this.clearQueue = function() {
                 documentList.clear();
             };
 
+            /**
+             * @description launch the request to the user.
+             * @param _Optimized if you want to reduce number of transaction.
+             * @dev some people want to have one transaction by signature. In this case, disable optimisation.
+             */
             this.requestSign = function(_Optimized = true) {
 
                 if(documentList.size === 0) {
@@ -581,8 +642,8 @@ function ULCDocAPI(_DefaultWeb3provider) {
             };
 
             /**
-            @title Function that request to Metamask simple Push document blockchain method.
-            @param _identifier the identifier of the document
+            @description Function that request to Metamask simple Push document blockchain method.
+            @param  {Object} _identifier the identifier of the document
             */
             function requestPushDoc(_identifier){
 
@@ -599,6 +660,10 @@ function ULCDocAPI(_DefaultWeb3provider) {
                 });
             }
 
+            /**
+             * @description Function that request to Metamask a simple confirmation blockchain method.
+             * @param {Object} _identifier
+             */
             function requestConfirmDoc(_identifier){
                 Kernel_Contract.methods.requestSignature(documentList.get(_identifier).hash).send({from: _fromAddress})
                 .on('error',(error) => {
@@ -668,10 +733,23 @@ function ULCDocAPI(_DefaultWeb3provider) {
 
         };
 
+        /**
+         * @description create a new document object.
+         * @param {String} _SignatureHash the hash of the document
+         * @return {ULCDocAPI.KernelDocument}
+         */
         this.createDocument = function(_SignatureHash){
             return new this.KernelDocument(_SignatureHash);
         };
 
+        /**
+         * @description create a document list handler to sign multiple document easily.
+         * @param {String} _fromAddress the sender
+         * @param {Function} _callBackTxHash
+         * @param {Function} _callBackReceipt
+         * @param {Function} _callBackError
+         * @return {ULCDocAPI.DocumentSignQueue}
+         */
         this.createSignQueue = function(_fromAddress, _callBackTxHash, _callBackReceipt, _callBackError){
             return new this.DocumentSignQueue(_fromAddress, _callBackTxHash, _callBackReceipt, _callBackError);
         }
@@ -692,15 +770,24 @@ function ULCDocAPI(_DefaultWeb3provider) {
         /* ------------------ */
 
         /**
-         * @title Function that check if we used connect() function.
+         * @description Function that check if we used connect() function.
          * @dev we must connect to the moderator to get configuration of the latter.
-         * @returns {boolean}
+         * @returns {loadDocumentDataV5ean}
          */
         this.connected = function() {
             return typeof Moderator_Info !== 'undefined';
         };
 
-        let Moderator_ConfigV4 = function(){
+        /**
+         * @typedef ModeratorConfig
+         * @type {Object}
+         * @property {number} version The version of the kernel
+         * @property {String} moderatorURL the moderator landpage
+         * @property {String} registerURL the register page to add a new kernel
+         * @property {String} searchURL the search page of the moderator
+         * @property {String} address the address of the moderator
+         */
+        let Moderator_Config = function(){
             this.version = 0;
             this.moderatorURL = "";
             this.registerURL = "";
@@ -708,6 +795,25 @@ function ULCDocAPI(_DefaultWeb3provider) {
             this.address = "";
         };
 
+        /**
+         * @typedef KernelIdentity
+         * @type {Object}
+         * @property {boolean} initialized if the kernel is initialized by moderator
+         * @property {boolean} confirmed if the kernel is valid
+         * @property {boolean} revoked if the kernel is revoked
+         * @property {boolean} organization if the kernel is an organisation
+         * @property {String} lastContractAddress the last known kernel address by moderator
+         * @property {number} revokedDate the UNIX date of revokation effective
+         * @property {String} revokedReason why moderator revoke this kernel
+         * @property {String} name the official name of the Kernel
+         * @property {String} url the website of the kernel
+         * @property {String} mail joingnable mail of the kernel
+         * @property {String} physicalAddress address where you can meet owner of kernel
+         * @property {String} imageURL image to use in src html
+         * @property {String} phone official phone in international format
+         * @property {Map<String, String>} extraData
+         * @property {number} version version of the identity. It's updated at each modification. Used for cache purpose
+         */
         let Kernel_Identity = function(){
             this.initialized = false;
             this.confirmed = false;
@@ -734,22 +840,28 @@ function ULCDocAPI(_DefaultWeb3provider) {
         //KernelInfo of the Kernel Contract
         let Moderator_Info;
 
+        /**
+         * @return {ModeratorConfig}
+         */
         this.getModeratorInfo = function() {
             return Moderator_Info;
         };
 
+        /**
+         * @return {String}
+         */
         this.getRawAddress = function() {
             return raw_address;
         };
 
 
         /**
-         * @title Function that fill Moderator info object for V4 and other compatible moderator Info object.
+         * @description Function that fill Moderator info object for V4 and other compatible moderator Info object.
          */
         let getModeratorConfigV5 = async function(){
             //lisibility purposes : creating an array
             let promList = [];
-            let info = new Moderator_ConfigV4();
+            let info = new Moderator_Config();
 
             //loading Moderator info elements
             promList.push(Moderator_Contract.methods.MODERATOR_URL().call());
@@ -775,10 +887,10 @@ function ULCDocAPI(_DefaultWeb3provider) {
             let queryIdentity = await Moderator_Contract.methods.getKernelIdentity(_kernelAddress).call();
 
             /*
-            [0] bool initialized;
-            [1] bool confirmed;
-            [2] bool revoked;
-            [3] bool organisation;
+            [0] boolean initialized;
+            [1] boolean confirmed;
+            [2] boolean revoked;
+            [3] boolean organisation;
             [4] address lastContractAddress;
             [5] uint256 version
             [6] uint256 revokedDate;
@@ -827,11 +939,10 @@ function ULCDocAPI(_DefaultWeb3provider) {
 
         };
         /**
-         @title connect : connect the API to a Kernel to check documents.
-         Can throw different errors :
+         @description connect : connect the API to a Kernel to check documents.
          @Throw Error if the version of the kernel is not compatible with the API.
          @Throw Error if we can't reach minimal functionnalities.
-         @return Moderator_Config object
+         @return {ModeratorConfig}
          */
         this.connect = async function () {
             //First we only load the versionner to know kernel version.
@@ -878,8 +989,8 @@ function ULCDocAPI(_DefaultWeb3provider) {
         };
 
         /**
-         * @title query : ask for mode information about a kernel.
-         *
+         * @description query : ask for mode information about a kernel.
+         * @returns {KernelIdentity}
          */
         this.query = async function (_kernelAddress){
 
@@ -924,7 +1035,7 @@ ULCDocAPI.COMPATIBLE_MOD_VERSION = [4];
 ULCDocAPI.COMPATIBLE_KERNEL_VERSION  = [5];
 
 /**
- * @title Error object when a dependancy is missing.
+ * @description Error object when a dependancy is missing.
  * @param message the message to be displayed
  */
 
@@ -935,7 +1046,7 @@ ULCDocAPI.DependancyError = function(message){
 };
 
 /**
- * @title Default address of moderator smart contract.
+ * @description Default address of moderator smart contract.
  */
 ULCDocAPI.DEFAULT_ADDRESS = new function () {
     this.BCE_MOD_MAINNET = "";
@@ -943,7 +1054,7 @@ ULCDocAPI.DEFAULT_ADDRESS = new function () {
 };
 
 /**
- * @title Function that check if an instance of web3/ethereum is injected by browser.
+ * @description Function that check if an instance of web3/ethereum is injected by browser.
  * @returns {boolean}
  */
 ULCDocAPI.usingInjector = function () {
@@ -951,7 +1062,7 @@ ULCDocAPI.usingInjector = function () {
 };
 
 /**
- * @title Function that return Infura Ropsten Web3 to init the API.
+ * @description Function that return Infura Ropsten Web3 to init the API.
  * @returns {Web3}
  */
 ULCDocAPI.getInfuraRopstenWeb3 = function() {
@@ -959,7 +1070,7 @@ ULCDocAPI.getInfuraRopstenWeb3 = function() {
 };
 
 /**
- * @title Function that return Infura Mainnet Web3 to init the API.
+ * @description Function that return Infura Mainnet Web3 to init the API.
  * @returns {Web3}
  */
 ULCDocAPI.getInfuraMainnetWeb3 = function() {
