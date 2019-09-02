@@ -13,7 +13,7 @@
   You should have received a copy of the GNU Lesser General Public License
   along with the   ULCDocuments Connector (ie: all files inside ABI folder)  . If not, see <http://www.gnu.org/licenses/>. */
 
-ULCDocKernelABI = [
+var ULCDocKernelV5_ABI = [
   {
     "constant": true,
     "inputs": [
@@ -236,6 +236,20 @@ ULCDocKernelABI = [
     "constant": false,
     "inputs": [
       {
+        "name": "_nextContract",
+        "type": "address"
+      }
+    ],
+    "name": "requestNextContract",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
         "name": "_removableOperator",
         "type": "address"
       }
@@ -292,6 +306,20 @@ ULCDocKernelABI = [
       {
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "CONTRACT_VERSION",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint16"
       }
     ],
     "payable": false,
@@ -480,7 +508,7 @@ ULCDocKernelABI = [
     "constant": false,
     "inputs": [
       {
-        "name": "_AllSignatureHash",
+        "name": "_signatureHashes",
         "type": "bytes32[]"
       }
     ],
@@ -502,20 +530,6 @@ ULCDocKernelABI = [
     ],
     "payable": false,
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_nextKernel",
-        "type": "address"
-      }
-    ],
-    "name": "requestNextKernel",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -555,7 +569,7 @@ ULCDocKernelABI = [
     "constant": false,
     "inputs": [
       {
-        "name": "_AllSignatureHash",
+        "name": "_signatureHashes",
         "type": "bytes32[]"
       },
       {
@@ -680,6 +694,20 @@ ULCDocKernelABI = [
       {
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "PREVIOUS_CONTRACT",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
       }
     ],
     "payable": false,
@@ -881,6 +909,20 @@ ULCDocKernelABI = [
       {
         "name": "",
         "type": "uint16"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "nextContract",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
       }
     ],
     "payable": false,
